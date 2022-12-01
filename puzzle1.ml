@@ -61,7 +61,7 @@ let () =
 (* ==== Part 2 : Max of Three ===== *)
 module MaxThreeList = ListWithAcc(struct
   type elem = SumList.t
-  type acc = int * int * int (* three top total, in ascending order *)
+  type acc = int * int * int (* three top total, in descending order *)
 
   let initial = (min_int, min_int, min_int)
 
