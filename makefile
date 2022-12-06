@@ -7,10 +7,11 @@
 # Constants
 # ===================================================
 
-DAY = 6
+DAY = 07
 
 OCAMLC = ocamlc
-TARGET = puzzle/$(DAY)/puzzle$(DAY)
+DIR = puzzles/$(DAY)
+TARGET = $(DIR)/puzzle
 EXE = $(TARGET).exe
 
 # set to ON/OFF to toggle ANSI escape sequences
@@ -60,7 +61,7 @@ $(EXE): $(TARGET).ml
 # =================================================
 
 # No display of executed commands.
-$(VERBOSE).SILENT:
+# $(VERBOSE).SILENT:
 
 .PHONY: compile
 compile: $(EXE) ## Compile the given puzzle
@@ -86,3 +87,10 @@ clean: ## Remove build files and executables
 help: ## Show this help
 	@echo "$(color_yellow)make:$(color_reset) list of useful targets:"
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(color_blue)%-$(HELP_PADDING)s$(color_reset) %s\n", $$1, $$2}'
+
+.PHONY: init
+init: ## Create files for the new day
+	mkdir $(DIR)
+	echo "(* ==== Puzzle $(DAY) : https://adventofcode.com/2022/day/$(DAY) ==== *)" > $(TARGET).ml
+	touch $(TARGET)_data.txt
+	touch $(TARGET)_text.txt
