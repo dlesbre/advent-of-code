@@ -7,7 +7,7 @@
 # Constants
 # ===================================================
 
-DAY = 5
+DAY = 6
 
 OCAMLC = ocamlc
 TARGET = puzzle/$(DAY)/puzzle$(DAY)
