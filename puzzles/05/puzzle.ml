@@ -22,8 +22,9 @@ let rec make_stacks acc =
 let rotate_stacks stacks =
   let n = List.length (List.hd stacks) in
   let arr = Array.make n [] in
-  List.iter (fun stack ->
-    List.iteri (fun i -> function None -> () | Some x -> arr.(i) <- x::(arr.(i))) stack
+  List.iter (List.iteri (fun i s -> match s with
+                         | None -> ()
+                         | Some x -> arr.(i) <- x::(arr.(i)))
   ) stacks; arr
 
 let pp_l = Format.pp_print_list Format.pp_print_char
