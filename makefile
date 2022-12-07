@@ -61,7 +61,7 @@ $(EXE): $(TARGET).ml
 # =================================================
 
 # No display of executed commands.
-# $(VERBOSE).SILENT:
+$(VERBOSE).SILENT:
 
 .PHONY: compile
 compile: $(EXE) ## Compile the given puzzle
@@ -90,7 +90,8 @@ help: ## Show this help
 
 .PHONY: init
 init: ## Create files for the new day
+	$(call print,Creating files for day $(DAY))
 	mkdir $(DIR)
 	echo "(* ==== Puzzle $(DAY) : https://adventofcode.com/2022/day/$(DAY) ==== *)" > $(TARGET).ml
 	touch $(TARGET)_data.txt
-	touch $(TARGET)_text.txt
+	touch $(TARGET)_test.txt
