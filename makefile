@@ -7,7 +7,7 @@
 # Constants
 # ===================================================
 
-DAY = 12
+DAY = 13
 
 OCAMLC = ocamlc
 DIR = puzzles/$(DAY)
