@@ -2,7 +2,6 @@
 
 type cell = {
   height: int;
-  mutable visited_in: int option; (* min number of steps to reach *)
   is_start: bool;
   is_end: bool;
 }
@@ -22,7 +21,6 @@ let rec read_all_lines acc =
         Array.init (String.length line) (fun i ->
           {
             height = get_height line.[i];
-            visited_in = None;
             is_start = line.[i] = 'S';
             is_end = line.[i] = 'E'
           }
@@ -95,15 +93,15 @@ let dijkstra start =
       let f vertex_queue v =
         let v_i = to_unique v in
         let dist_thru_u = opt_incr u.distance in
-          if dist_thru_u >== min_distance.(v_i) then vertex_queue
-          else begin
-            let vertex_queue' = VertexSet.remove (make_vertex v) vertex_queue in
-            min_distance.(to_unique v) <- dist_thru_u;
-            (* previous.(v) <- u; *)
-            VertexSet.add (make_vertex v) vertex_queue'
-          end
-        in
-        aux (List.fold_left f vertex_queue' edges)
+        if dist_thru_u >== min_distance.(v_i) then vertex_queue
+        else begin
+          let vertex_queue' = VertexSet.remove (make_vertex v) vertex_queue in
+          min_distance.(to_unique v) <- dist_thru_u;
+          (* previous.(v) <- u; *)
+          VertexSet.add (make_vertex v) vertex_queue'
+        end
+      in
+      aux (List.fold_left f vertex_queue' edges)
     in
     aux (VertexSet.singleton (make_vertex start));
     min_distance
