@@ -25,6 +25,7 @@ let foldi_of_fold fold (f: 'a -> int -> 'b -> 'a) acc l =
   fst (fold (fun (acc,i) x -> (f acc i x, i+1)) (acc,0) l)
 
 let list_foldi f = foldi_of_fold List.fold_left f
+let string_foldi f = foldi_of_fold String.fold_left f
 
 module Vec2 = struct
   type t = int * int
