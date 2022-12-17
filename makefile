@@ -7,7 +7,7 @@
 # Constants
 # ===================================================
 
-DAY = 16
+DAY = 17
 
 OCAMLC = ocamlc
 DIR = puzzles/$(DAY)
@@ -69,12 +69,12 @@ compile: $(EXE) ## Compile the given puzzle
 .PHONY: run-test
 run-test: $(EXE) ## Compile and run with test data
 	$(call print,Running $< with test data)
-	./$(EXE) < $(TARGET)_test.txt
+	time ./$(EXE) < $(TARGET)_test.txt
 
 .PHONY: run
 run: $(EXE) ## Compile and run with input data
 	$(call print,Running $< with input data)
-	./$(EXE) < $(TARGET)_data.txt
+	time ./$(EXE) < $(TARGET)_data.txt
 
 .PHONY: clean
 clean: ## Remove build files and executables
