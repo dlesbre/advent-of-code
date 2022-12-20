@@ -42,7 +42,7 @@ end = struct
     next=List.hd t.prev :: t.next
   }
 
-  let rec move_to x t =
+  let rec move_to x t = (* assumes x is canonical position *)
     match x - t.pos with
     | 0 -> t
     | i when i < 0 -> move_to x (move_back t)
@@ -51,23 +51,27 @@ end = struct
   let get_hd t = List.hd t.next
   let set_hd t v = { t with next = v :: List.tl t.next }
 
-  let shift t i =
-    if i = 0 then t else
-    let x = canonical_coordinate {t with size=t.size-1} (t.pos + i) in
-    let v = get_hd t in
-    let t = { t with next=List.tl t.next } in
+  let pop t = (* remove element at current position *)
+    get_hd t, { t with size=t.size-1; next=List.tl t.next }
+
+  let add t v = (* add element at current position *)
+    { t with size=t.size+1; next=v::t.next }
+
+  let shift t i = (* shift element at current position by i *)
+    let v, t = pop t in
+    let x = canonical_coordinate t (t.pos + i) in
     let t = move_to x t in
-    { t with next=v::t.next}
+    add t v
 
   let find_first t f =
-    let t = to_head t in
     let rec aux t =
       if f (get_hd t)
       then Some t
       else
-        if t.pos + 1 = t.size then None
+        if t.pos + 1 = t.size
+        then None
         else aux (move_forward t)
-    in aux t
+    in aux (to_head t)
 
   let get t i =
     let t = move_to (canonical_coordinate t i) t in
