@@ -16,6 +16,8 @@ DIR = $(YEAR)/$(DAY)
 TARGET = $(DIR)/puzzle
 EXE = $(TARGET).exe
 
+TIME = time -f "Stats:\n  Total time: %E\n  User Mode: %U\n  Kernel Mode: %S\n  CPU: %P\n  Memory (kB): %M"
+
 # set to ON/OFF to toggle ANSI escape sequences
 COLOR = ON
 
@@ -87,12 +89,12 @@ compile: $(EXE) ## Compile the given puzzle
 .PHONY: run-test
 run-test: $(EXE) ## Compile and run with test data
 	$(call print,Running $< with test data)
-	time ./$(EXE) < $(TARGET)_test.txt
+	$(TIME) ./$(EXE) < $(TARGET)_test.txt
 
 .PHONY: run
 run: $(EXE) ## Compile and run with input data
 	$(call print,Running $< with input data)
-	time ./$(EXE) < $(TARGET)_data.txt
+	$(TIME) ./$(EXE) < $(TARGET)_data.txt
 
 .PHONY: clean
 clean: ## Remove build files and executables
