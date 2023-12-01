@@ -7,10 +7,12 @@
 # Constants
 # ===================================================
 
-DAY = 25
+DAY = 01
+YEAR = 2023
 
 OCAMLC = ocamlc
-DIR = 2022/$(DAY)
+RUSTC = rustc
+DIR = $(YEAR)/$(DAY)
 TARGET = $(DIR)/puzzle
 EXE = $(TARGET).exe
 
@@ -27,6 +29,12 @@ HELP_PADDING = 15
 # ==================================================
 # Make code and variable setting
 # ==================================================
+
+ifeq ($(YEAR),2022)
+	EXT = ml
+else
+	EXT = rs
+endif
 
 ifeq ($(COLOR),ON)
 	color_yellow = \033[93;1m
@@ -52,9 +60,19 @@ default: run-test
 # Specific rules
 # =================================================
 
+ifeq ($(YEAR),2022)
+
 $(EXE): $(TARGET).ml
-	$(call print,Compiling $<)
+	$(call print,Compiling $< with ocaml)
 	$(OCAMLC) $< -o $@
+
+else
+
+$(EXE): $(TARGET).rs
+	$(call print,Compiling $< with rust)
+	$(RUSTC) $< -o $@
+
+endif
 
 # =================================================
 # Special Targets
@@ -92,6 +110,6 @@ help: ## Show this help
 init: ## Create files for the new day
 	$(call print,Creating files for day $(DAY))
 	mkdir $(DIR)
-	echo "(* ==== Puzzle $(DAY) : https://adventofcode.com/2022/day/$(DAY) ==== *)" > $(TARGET).ml
+	echo "// ==== Puzzle $(DAY) : https://adventofcode.com/$(YEAR)/day/$(DAY) ====" > $(TARGET).ml
 	touch $(TARGET)_data.txt
 	touch $(TARGET)_test.txt
