@@ -10,7 +10,7 @@
 DAY = 25
 
 OCAMLC = ocamlc
-DIR = puzzles/$(DAY)
+DIR = 2022/$(DAY)
 TARGET = $(DIR)/puzzle
 EXE = $(TARGET).exe
 
