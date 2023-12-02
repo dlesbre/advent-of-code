@@ -2,3 +2,5 @@ a.out
 *.cmi
 *.cmo
 *.exe
+
+target/*

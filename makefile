@@ -7,7 +7,7 @@
 # Constants
 # ===================================================
 
-DAY = 01
+DAY = 02
 YEAR = 2023
 PART = 2
 
@@ -113,6 +113,6 @@ help: ## Show this help
 init: ## Create files for the new day
 	$(call print,Creating files for day $(DAY))
 	mkdir $(DIR)
-	echo "// ==== Puzzle $(DAY) : https://adventofcode.com/$(YEAR)/day/$(DAY) ====" > $(TARGET).ml
+	echo "// ==== Puzzle $(DAY) : https://adventofcode.com/$(YEAR)/day/$(DAY) ====" > $(TARGET).$(EXT)
 	touch $(TARGET)_data.txt
 	touch $(TARGET)_test.txt
