@@ -1,7 +1,5 @@
 // Puzzle 01 : https://adventofcode.com/2023/day/1
 
-const PART_TWO: bool = true;
-
 fn parse_file_lines() -> Vec<String> {
     let mut file_lines: Vec<String> = Vec::new();
     for line in std::io::stdin().lines() {
@@ -13,29 +11,28 @@ fn parse_file_lines() -> Vec<String> {
     return file_lines;
 }
 
-fn char_first(str: &String) -> char {
-    for c in str.chars() {
-        if c.is_digit(10) {
-            return c;
-        }
-    }
-    panic!("No number on line");
+fn char_first(str: &str) -> u32 {
+    str.chars()
+        .find(|c| c.is_digit(10))
+        .unwrap()
+        .to_digit(10)
+        .unwrap()
 }
 
-fn char_last(str: &String) -> char {
-    for c in str.chars().rev() {
-        if c.is_digit(10) {
-            return c;
-        }
-    }
-    panic!("No number on line");
+fn char_last(str: &str) -> u32 {
+    str.chars()
+        .rev()
+        .find(|c| c.is_digit(10))
+        .unwrap()
+        .to_digit(10)
+        .unwrap()
 }
 
 fn main() {
     let lines = parse_file_lines();
     let mut sum = 0;
     for mut line in lines {
-        if PART_TWO {
+        if cfg!(part = "2") {
             // there can be overlap, like oneight
             line = line.replace("one", "o1e");
             line = line.replace("two", "t2o");
@@ -47,14 +44,7 @@ fn main() {
             line = line.replace("eight", "e8t");
             line = line.replace("nine", "n9e");
         }
-        match char_first(&line).to_digit(10) {
-            Some(digit) => sum += 10 * digit,
-            None => panic!("Not a digit"),
-        };
-        match char_last(&line).to_digit(10) {
-            Some(digit) => sum += digit,
-            None => panic!("Not a digit"),
-        };
+        sum += 10 * char_first(&line) + char_last(&line);
     }
     println!("{}", sum);
 }

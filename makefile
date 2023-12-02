@@ -9,9 +9,10 @@
 
 DAY = 01
 YEAR = 2023
+PART = 2
 
 OCAMLC = ocamlc
-RUSTC = rustc
+RUSTC = rustc --cfg 'part="$(PART)"'
 DIR = $(YEAR)/$(DAY)
 TARGET = $(DIR)/puzzle
 EXE = $(TARGET).exe
