@@ -7,12 +7,13 @@
 # Constants
 # ===================================================
 
-DAY = 02
+DAY = 03
 YEAR = 2023
-PART = 2
+PART = 1
 
 OCAMLC = ocamlc
 RUSTC = rustc --cfg 'part="$(PART)"'
+CARGO = cargo
 DIR = $(YEAR)/$(DAY)
 TARGET = $(DIR)/puzzle
 EXE = $(TARGET).exe
@@ -28,6 +29,8 @@ COLOR = ON
 # padding for help on targets
 # should be > than the longest target
 HELP_PADDING = 15
+
+CARGO_TGT = ./target/debug/puzzle
 
 # ==================================================
 # Make code and variable setting
@@ -71,9 +74,16 @@ $(EXE): $(TARGET).ml
 
 else
 
-$(EXE): $(TARGET).rs
+$(EXE): $(CARGO_TGT)
+	cp "$(CARGO_TGT)" "$(EXE)"
+
+$(CARGO_TGT): $(TARGET).rs
 	$(call print,Compiling $< with rust)
-	$(RUSTC) $< -o $@
+	$(CARGO) build
+
+# $(EXE): $(TARGET).rs
+# 	$(call print,Compiling $< with rust)
+# 	$(RUSTC) $< -o $@
 
 endif
 
