@@ -15,21 +15,27 @@ fn read_lines() -> Vec<String> {
     return file_lines;
 }
 
-struct PartNumber {
-    number: i32,
+struct SchemaPart {
+    object: Option<i32>, // Some for numbers, None for gears
     line: usize,         // starts at 0
     column_start: usize, // starts at 0
     column_end: usize,
 }
 
-fn all_numbers(lines: &Vec<String>) -> Vec<PartNumber> {
-    let nb = Regex::new(r"(\d+)").unwrap();
+fn all_numbers(lines: &Vec<String>) -> Vec<SchemaPart> {
+    let nb = Regex::new(r"(\d+|\*)").unwrap();
     let mut found = Vec::with_capacity(lines.len() * 10);
     for (y, line) in lines.iter().enumerate() {
         for capture in nb.captures_iter(line) {
             let matc = capture.get(0).unwrap();
-            found.push(PartNumber {
-                number: matc.as_str().parse().unwrap(),
+            let str = matc.as_str();
+            let object = if str == "*" {
+                None
+            } else {
+                Some(str.parse().unwrap())
+            };
+            found.push(SchemaPart {
+                object,
                 line: y,
                 column_start: matc.start(),
                 column_end: matc.end(),
@@ -39,7 +45,7 @@ fn all_numbers(lines: &Vec<String>) -> Vec<PartNumber> {
     return found;
 }
 
-fn check_neighbors(lines: &Vec<String>, number: &PartNumber) -> bool {
+fn check_neighbors(lines: &Vec<String>, number: &SchemaPart) -> bool {
     let x_start = usize::saturating_sub(number.column_start, 1);
     let x_end = min(number.column_end + 1, lines[0].len() - 1);
 
@@ -62,15 +68,51 @@ fn check_neighbors(lines: &Vec<String>, number: &PartNumber) -> bool {
     return false;
 }
 
-fn main() {
-    let lines = read_lines();
-    let numbers = all_numbers(&lines);
-    let mut sum = 0;
-    for number in numbers {
-        if check_neighbors(&lines, &number) {
-            // println!("nb: {}", number.number);
-            sum += number.number;
+fn gear_ratio(gear: &SchemaPart, parts: &Vec<SchemaPart>) -> i32 {
+    let mut found = 0;
+    let mut prod = 1;
+    for part in parts {
+        match part.object {
+            None => (),
+            Some(n) => {
+                let x_start = usize::saturating_sub(part.column_start, 1);
+                let x_end = part.column_end + 1;
+
+                let y_start = usize::saturating_sub(part.line, 1);
+                let y_end = part.line + 2;
+                // println!(
+                //     "Checking with: {} at {}--{} {}--{}",
+                //     n, x_start, x_end, y_start, y_end
+                // );
+                if (x_start..x_end).contains(&gear.column_start)
+                    && (y_start..y_end).contains(&gear.line)
+                {
+                    prod *= n;
+                    found += 1;
+                }
+            }
         }
     }
-    println!("{}", sum);
+    if found == 2 {
+        return prod;
+    }
+    return 0;
+}
+fn main() {
+    let lines = read_lines();
+    let parts = all_numbers(&lines);
+    let mut sum = 0;
+    let mut ratio = 0;
+    for part in &parts {
+        match part.object {
+            Some(n) => {
+                if check_neighbors(&lines, &part) {
+                    sum += n;
+                }
+            }
+            None => ratio += gear_ratio(&part, &parts),
+        }
+    }
+    println!("Sum: {}", sum);
+    println!("Ratio: {}", ratio);
 }
