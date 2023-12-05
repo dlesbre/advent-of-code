@@ -11,3 +11,4 @@ path = "2023/05/puzzle.rs"
 
 [dependencies]
 regex = "1.10.2"
+itertools = "0.12.0"
