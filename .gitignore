@@ -9,4 +9,5 @@ a.out
 target
 
 # Advent of code puzzle inputs
-*/puzzle_data.txt
+**/puzzle_data.txt
+**/puzzle_test.txt
