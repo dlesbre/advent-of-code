@@ -1,6 +1,12 @@
 a.out
-*.cmi
-*.cmo
 *.exe
 
+# Ocaml build files
+*.cmi
+*.cmo
+
+# Cargo files
 target
+
+# Advent of code puzzle inputs
+*/puzzle_data.txt
