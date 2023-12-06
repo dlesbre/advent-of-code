@@ -35,13 +35,14 @@ fn parse_line(line: &str) -> Vec<usize> {
 //    so t in an interval of width t
 //
 // You could also use the monotonicity of the result
-// i.e. if p_1 < p_2 are valid then all p_1 .. p_2 will be two
-// However, the brute force naive method runs in < 3s so I can't be bothered...
-fn dist(time: usize, wait: usize) -> usize {
+// i.e. if p_1 < p_2 are valid then all p_1 .. p_2 will be too
+//
+// Also, the brute force naive method runs in < 3s...
+fn _dist(time: usize, wait: usize) -> usize {
     (time - wait) * wait
 }
 
-fn main() {
+fn _main() {
     // For part 2, change inputs to remove spaces...
     let lines = read_lines();
     let times = parse_line(&lines[0]);
@@ -58,6 +59,22 @@ fn main() {
         }
         // println!("Nb: {}", nb);
         prod *= nb;
+    }
+    println!("{}", prod);
+}
+
+fn main() {
+    // For part 2, change inputs to remove spaces...
+    let lines = read_lines();
+    let times = parse_line(&lines[0]);
+    let dists = parse_line(&lines[1]);
+    let mut prod = 1;
+
+    for (&t, d) in times.iter().zip(dists) {
+        let delta = ((t * t - 4 * d) as f64).sqrt();
+        let low = (t as f64 - delta) / 2.0;
+        let high = (t as f64 + delta) / 2.0;
+        prod *= (high.floor() - low.ceil()) as usize + 1;
     }
     println!("{}", prod);
 }
