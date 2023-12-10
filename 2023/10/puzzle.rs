@@ -132,11 +132,6 @@ fn find_start(lines: &Vec<Vec<Tile>>) -> P2 {
     panic!("Not found");
 }
 
-enum Status {
-    Unexplored,
-    Loop(u32),
-}
-
 // fn explore(map: &Vec<Vec<Tile>>, status: &mut Vec<Vec<Status>>, todo: &mut VecDeque<P2>) {
 //   match todo.pop_front() {
 //     None => (),
@@ -157,7 +152,7 @@ fn in_bounds(p: &P2, max: &P2) -> bool {
 // tail-recursive
 fn follow_branch(
     map: &Vec<Vec<Tile>>,
-    pos: P2,
+    pos: &P2,
     dir: Direction,
     steps: u32,
     max: &P2,
@@ -174,45 +169,20 @@ fn follow_branch(
     }
     match neighbors.next(&dir) {
         None => None,
-        Some(n) => follow_branch(map, npos, n, steps + 1, max),
+        Some(n) => follow_branch(map, &npos, n, steps + 1, max),
     }
 }
-fn dfs(
-    map: &Vec<Vec<Tile>>,
-    status: &mut Vec<Vec<Status>>,
-    pos: P2,
-    dir: Direction,
-    steps: u32,
-    max: &P2,
-) -> bool {
-    let npos = pos.step(&dir);
-    if !in_bounds(&npos, max) {
-        // out of bounds
-        return false;
-    }
-    let node = &map[npos.y - 1][npos.x - 1];
-    let neighbors = node.neighbors();
-    if neighbors == Neighbors::Start {
-        return true;
-    }
-    let next = match neighbors.next(&dir) {
-        None => {
-            return false;
-        }
-        Some(n) => n,
-    };
-    match status[npos.y - 1][npos.x - 1] {
-        //Status::DeadPath => false,
-        Status::Loop(n) if (n <= steps) => true,
-        _ => {
-            // if *node == Tile::Empty {
-            //     status[pos.y - 1][pos.x - 1] = Status::DeadPath;
-            //     return false;
-            // }
-            status[pos.y - 1][pos.x - 1] = Status::Loop(steps);
-            return dfs(map, status, npos, next, steps + 1, max);
+
+const DIRECTIONS: [Direction; 4] = [Direction::N, Direction::S, Direction::E, Direction::W];
+
+fn find_loop(map: &Vec<Vec<Tile>>, pos: &P2, max: &P2) -> (Direction, u32) {
+    for dir in DIRECTIONS {
+        match follow_branch(map, pos, dir, 0, max) {
+            Some(n) => return (dir, n),
+            None => continue,
         }
     }
+    panic!("No loop");
 }
 
 fn main() {
@@ -222,37 +192,6 @@ fn main() {
         x: input[0].len() + 1,
         y: input.len() + 1,
     };
-    let mut status: Vec<Vec<_>> = input
-        .iter()
-        .map(|x| x.iter().map(|_| Status::Unexplored).collect())
-        .collect();
-    status[start.y - 1][start.x - 1] = Status::Loop(0);
-    dfs(&input, &mut status, start.clone(), Direction::N, 0, &max);
-    dfs(&input, &mut status, start.clone(), Direction::S, 0, &max);
-    dfs(&input, &mut status, start.clone(), Direction::E, 0, &max);
-    dfs(&input, &mut status, start, Direction::W, 0, &max);
-
-    println!(
-        "{:?}",
-        status
-            .iter()
-            .map(|v| v
-                .iter()
-                .map(|x| match x {
-                    Status::Loop(n) => *n,
-                    _ => 0,
-                })
-                .max())
-            .max()
-    );
-    for vec in status {
-        for s in vec {
-            match s {
-                // Status::DeadPath => print!("_"),
-                Status::Loop(n) => print!("{}", n),
-                Status::Unexplored => print!("+"),
-            }
-        }
-        println!("");
-    }
+    let (dir, len) = find_loop(&input, &start, &max);
+    println!("Part 1 : {}", len / 2 + if len % 2 == 1 { 1 } else { 0 });
 }
