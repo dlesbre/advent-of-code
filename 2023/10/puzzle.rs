@@ -19,7 +19,7 @@ impl Direction {
     }
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
 enum Tile {
     NS,
     EW,
@@ -185,6 +185,87 @@ fn find_loop(map: &Vec<Vec<Tile>>, pos: &P2, max: &P2) -> (Direction, u32) {
     panic!("No loop");
 }
 
+// Part 2
+
+enum Status {
+    Loop(Tile),
+    NotLoop,
+}
+
+// Similar to follow branch, but simple since we now know the loop (no overflows)
+// Marks all points of the loop in state
+fn fill_loop(
+    map: &Vec<Vec<Tile>>,
+    pos: &P2,
+    dir: Direction,
+    points: &mut Vec<Vec<Status>>,
+) -> Direction {
+    let npos = pos.step(&dir);
+    let node = &map[npos.y - 1][npos.x - 1];
+    points[npos.y - 1][npos.x - 1] = Status::Loop(*node);
+    let neighbors = node.neighbors();
+    if neighbors == Neighbors::Start {
+        return dir;
+    }
+    match neighbors.next(&dir) {
+        None => panic!("On the loop"),
+        Some(n) => fill_loop(map, &npos, n, points),
+    }
+}
+
+#[derive(PartialEq, Eq)]
+enum Crossing {
+    FromNorth,
+    FromSouth,
+    None,
+}
+
+// A point is in the loop IFF it crosses the loop path an even number of times
+// before reaching the edge. Crossing is a bit tricky though, as
+// We may encounter nodes like NE-EW-NW which count as zero crossings
+fn count_row(points: &Vec<Status>) -> i32 {
+    let mut total = 0;
+    let mut in_loop = false;
+    let mut entry = Crossing::None;
+    for p in points {
+        // match p {
+        //     Status::NotLoop => print!(" "),
+        //     Status::Loop(tile) => print!("{:?}", tile),
+        // };
+        match p {
+            Status::NotLoop => total += in_loop as i32,
+            Status::Loop(Tile::NS) => in_loop = !in_loop,
+            Status::Loop(Tile::EW | Tile::Empty) => (),
+            Status::Loop(Tile::SE) => {
+                assert!(entry == Crossing::None);
+                entry = Crossing::FromSouth
+            }
+            Status::Loop(Tile::NE) => {
+                assert!(entry == Crossing::None);
+                entry = Crossing::FromNorth
+            }
+            Status::Loop(Tile::SW) => {
+                match entry {
+                    Crossing::FromNorth => in_loop = !in_loop,
+                    Crossing::FromSouth => (),
+                    Crossing::None => panic!("We should have crossed here"),
+                };
+                entry = Crossing::None;
+            }
+            Status::Loop(Tile::NW) => {
+                match entry {
+                    Crossing::FromSouth => in_loop = !in_loop,
+                    Crossing::FromNorth => (),
+                    Crossing::None => panic!("We should have crossed here"),
+                };
+                entry = Crossing::None;
+            }
+            Status::Loop(Tile::Start) => panic!("Start should have been substituted"),
+        }
+    }
+    return total;
+}
+
 fn main() {
     let input = read_lines();
     let start = find_start(&input);
@@ -194,4 +275,30 @@ fn main() {
     };
     let (dir, len) = find_loop(&input, &start, &max);
     println!("Part 1 : {}", len / 2 + if len % 2 == 1 { 1 } else { 0 });
+
+    let mut status = input
+        .iter()
+        .map(|vec| vec.iter().map(|_| Status::NotLoop).collect())
+        .collect();
+    let dir2 = fill_loop(&input, &start, dir, &mut status);
+    use Direction::{E, N, S, W};
+    status[start.y - 1][start.x - 1] = Status::Loop(match (dir, dir2.flip()) {
+        (N, E) => Tile::NE,
+        (N, W) => Tile::NW,
+        (N, S) => Tile::NS,
+        (S, N) => Tile::NS,
+        (S, E) => Tile::SE,
+        (S, W) => Tile::SW,
+        (E, W) => Tile::EW,
+        (E, N) => Tile::NE,
+        (E, S) => Tile::SE,
+        (W, E) => Tile::EW,
+        (W, N) => Tile::NW,
+        (W, S) => Tile::SW,
+        _ => panic!("Invalid start path"),
+    });
+    let status = status; // mutability is evil
+
+    let total: i32 = status.iter().map(count_row).sum();
+    println!("Part 1 : {}", total);
 }
