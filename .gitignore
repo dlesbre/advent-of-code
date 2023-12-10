@@ -7,6 +7,7 @@ a.out
 
 # Cargo files
 target
+Cargo.lock
 
 # Advent of code puzzle inputs
 **/puzzle_data.txt

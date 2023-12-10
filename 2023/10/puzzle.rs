@@ -192,8 +192,8 @@ enum Status {
     NotLoop,
 }
 
-// Similar to follow branch, but simple since we now know the loop (no overflows)
-// Marks all points of the loop in state
+// Similar to follow_branch, but simpler since we now know the loop (no bound checks, yay!)
+// Marks all points of the loop in the points vector
 fn fill_loop(
     map: &Vec<Vec<Tile>>,
     pos: &P2,
@@ -213,54 +213,18 @@ fn fill_loop(
     }
 }
 
-#[derive(PartialEq, Eq)]
-enum Crossing {
-    FromNorth,
-    FromSouth,
-    None,
-}
-
 // A point is in the loop IFF it crosses the loop path an even number of times
 // before reaching the edge. Crossing is a bit tricky though, as
 // We may encounter nodes like NE-EW-NW which count as zero crossings
+// It is sufficient to flip only when we cross a tile going north
 fn count_row(points: &Vec<Status>) -> i32 {
     let mut total = 0;
     let mut in_loop = false;
-    let mut entry = Crossing::None;
     for p in points {
-        // match p {
-        //     Status::NotLoop => print!(" "),
-        //     Status::Loop(tile) => print!("{:?}", tile),
-        // };
         match p {
             Status::NotLoop => total += in_loop as i32,
-            Status::Loop(Tile::NS) => in_loop = !in_loop,
-            Status::Loop(Tile::EW | Tile::Empty) => (),
-            Status::Loop(Tile::SE) => {
-                assert!(entry == Crossing::None);
-                entry = Crossing::FromSouth
-            }
-            Status::Loop(Tile::NE) => {
-                assert!(entry == Crossing::None);
-                entry = Crossing::FromNorth
-            }
-            Status::Loop(Tile::SW) => {
-                match entry {
-                    Crossing::FromNorth => in_loop = !in_loop,
-                    Crossing::FromSouth => (),
-                    Crossing::None => panic!("We should have crossed here"),
-                };
-                entry = Crossing::None;
-            }
-            Status::Loop(Tile::NW) => {
-                match entry {
-                    Crossing::FromSouth => in_loop = !in_loop,
-                    Crossing::FromNorth => (),
-                    Crossing::None => panic!("We should have crossed here"),
-                };
-                entry = Crossing::None;
-            }
-            Status::Loop(Tile::Start) => panic!("Start should have been substituted"),
+            Status::Loop(Tile::NS | Tile::NE | Tile::NW) => in_loop = !in_loop,
+            Status::Loop(_) => (),
         }
     }
     return total;
