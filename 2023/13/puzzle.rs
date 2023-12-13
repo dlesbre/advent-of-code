@@ -51,11 +51,11 @@ fn check_symmetry(ints: Vec<usize>, part2: &bool) -> Option<usize> {
     return None;
 }
 
-fn parse_int(x: &String) -> usize {
+fn parse_int<'a, T: IntoIterator<Item = &'a u8>>(x: T) -> usize {
     let mut nb = 0;
-    for c in x.chars() {
+    for c in x {
         nb <<= 1;
-        if c == '#' {
+        if *c == ('#' as u8) {
             nb |= 1;
         }
     }
@@ -63,25 +63,15 @@ fn parse_int(x: &String) -> usize {
 }
 
 fn find_symmetry(v: &Vec<String>, part2: &bool) -> usize {
-    let ints: Vec<usize> = v.iter().map(parse_int).collect();
-    match check_symmetry(ints, part2) {
-        Some(x) => {
-            return 100 * x;
-        }
-        None => (),
+    let ints: Vec<usize> = v.iter().map(|c| parse_int(c.as_bytes().iter())).collect();
+    if let Some(x) = check_symmetry(ints, part2) {
+        return 100 * x;
     }
-    let mut ints = Vec::new();
+
     let v_bytes: Vec<&[u8]> = v.iter().map(|c| c.as_bytes()).collect();
-    for i in 0..(v[0].len()) {
-        let mut nb: usize = 0;
-        for b in &v_bytes {
-            nb <<= 1;
-            if b[i] == ('#' as u8) {
-                nb |= 1;
-            }
-        }
-        ints.push(nb);
-    }
+    let ints: Vec<usize> = (0..(v[0].len()))
+        .map(|i| parse_int(v_bytes.iter().map(|v| &v[i])))
+        .collect();
     match check_symmetry(ints, part2) {
         Some(x) => x,
         None => panic!("No symmetry found!"),
