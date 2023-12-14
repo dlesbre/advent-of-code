@@ -131,7 +131,6 @@ fn billion_iterations(
         Some(m) => {
             let cycle_len = n - m;
             let end = 1_000_000_000 - m;
-            println!("{}, {}, {}, {}, {}", n, m, cycle_len, end, end % cycle_len);
             return final_iterations(end % cycle_len, grid);
         }
         None => (),
