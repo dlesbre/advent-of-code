@@ -7,7 +7,7 @@
 # Constants
 # ===================================================
 
-DAY = 14
+DAY = 15
 YEAR = 2023
 PART = 1
 
@@ -77,7 +77,7 @@ else
 $(EXE): $(CARGO_TGT)
 	cp "$(CARGO_TGT)" "$(EXE)"
 
-$(CARGO_TGT): $(TARGET).rs
+$(CARGO_TGT): $(TARGET).rs cargo
 	$(call print,Compiling $< with rust)
 	$(CARGO) build
 
@@ -93,6 +93,10 @@ endif
 
 # No display of executed commands.
 $(VERBOSE).SILENT:
+
+.PHONY: cargo
+cargo:
+	sed -i '8s#.*#path = "$(YEAR)/$(DAY)/puzzle.rs"#' Cargo.toml
 
 .PHONY: compile
 compile: $(EXE) ## Compile the given puzzle
