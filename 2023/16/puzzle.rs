@@ -39,10 +39,6 @@ struct DirectionSet(isize);
 impl DirectionSet {
     const EMPTY: DirectionSet = DirectionSet(0);
 
-    // fn of_direction(x: &Direction) -> Self {
-    //     DirectionSet(*x as isize)
-    // }
-
     fn is_empty(&self) -> bool {
         let DirectionSet(i) = self;
         *i == 0
@@ -183,17 +179,6 @@ fn main() {
         .collect();
 
     let p1 = solve(&lines, P2 { x: 0, y: 0 }, E, &mut energized);
-
-    // for line in energized {
-    //     for v in line {
-    //         if v.is_empty() {
-    //             print!(".");
-    //         } else {
-    //             print!("#");
-    //         }
-    //     }
-    //     println!("");
-    // }
     println!("Part 1 : {}", p1);
 
     let mut max = 0;
