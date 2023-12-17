@@ -11,9 +11,9 @@ struct P2 {
 #[derive(PartialEq, Eq, Clone, Copy, Debug, PartialOrd, Ord)]
 enum Direction {
     S = 0,
-    E = 7,
-    W = 14,
-    N = 21,
+    E = 1,
+    W = 3,
+    N = 2,
 }
 
 impl P2 {
@@ -45,7 +45,7 @@ struct Head {
     score: u32,
     pos: P2,
     dir: Direction,
-    amount: u8,
+    // amount: u8,
 }
 
 fn read_lines() -> Vec<Vec<u32>> {
@@ -75,7 +75,7 @@ fn step(
                 worklist.insert(Head {
                     pos: p,
                     dir: *dir,
-                    amount: (amount - amount_min).try_into().unwrap(),
+                    // amount: (amount - amount_min).try_into().unwrap(),
                     score,
                 });
             }
@@ -87,7 +87,7 @@ fn step(
 
 use Direction::*;
 
-const VISITED: usize = 7 * 4;
+const VISITED: usize = 2;
 
 fn bfs(
     grid: &Vec<Vec<u32>>,
@@ -100,10 +100,10 @@ fn bfs(
 ) {
     while let Some(hd) = worklist.pop_first() {
         //println!("At {:?}, {}", hd.pos, hd.amount);
-        if visited[hd.pos.y][hd.pos.x][hd.amount as usize + hd.dir as usize] <= hd.score {
+        if visited[hd.pos.y][hd.pos.x][hd.dir as usize & 1] <= hd.score {
             continue;
         }
-        visited[hd.pos.y][hd.pos.x][hd.amount as usize + hd.dir as usize] = hd.score;
+        visited[hd.pos.y][hd.pos.x][hd.dir as usize & 1] = hd.score;
         if hd.pos.y == max_y - 1 && hd.pos.x == max_x - 1 {
             break;
         }
