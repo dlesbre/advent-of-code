@@ -1,14 +1,14 @@
 // ==== Puzzle 17 : https://adventofcode.com/2023/day/17 ====
 
-use std::collections::VecDeque;
+use std::collections::BTreeSet;
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 struct P2 {
     x: usize,
     y: usize,
 }
 
-#[derive(PartialEq, Eq, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug, PartialOrd, Ord)]
 enum Direction {
     S = 0,
     E = 7,
@@ -40,11 +40,12 @@ impl P2 {
     }
 }
 
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
 struct Head {
+    score: u32,
     pos: P2,
     dir: Direction,
     amount: u8,
-    score: u32,
 }
 
 fn read_lines() -> Vec<Vec<u32>> {
@@ -64,14 +65,14 @@ fn step(
     mut score: u32,
     max_x: usize,
     max_y: usize,
-    worklist: &mut VecDeque<Head>,
+    worklist: &mut BTreeSet<Head>,
 ) {
     for amount in 1..=amount_max {
         //println!("{}", amount);
         if let Some(p) = pos.step(amount, &dir, max_x, max_y) {
             score += grid[p.y][p.x];
             if amount >= amount_min {
-                worklist.push_back(Head {
+                worklist.insert(Head {
                     pos: p,
                     dir: *dir,
                     amount: (amount - amount_min).try_into().unwrap(),
@@ -91,18 +92,21 @@ const VISITED: usize = 7 * 4;
 fn bfs(
     grid: &Vec<Vec<u32>>,
     visited: &mut Vec<Vec<[u32; VISITED]>>,
-    worklist: &mut VecDeque<Head>,
+    worklist: &mut BTreeSet<Head>,
     max_x: usize,
     max_y: usize,
     amount_min: usize,
     amount_max: usize,
 ) {
-    while let Some(hd) = worklist.pop_front() {
+    while let Some(hd) = worklist.pop_first() {
         //println!("At {:?}, {}", hd.pos, hd.amount);
         if visited[hd.pos.y][hd.pos.x][hd.amount as usize + hd.dir as usize] <= hd.score {
             continue;
         }
         visited[hd.pos.y][hd.pos.x][hd.amount as usize + hd.dir as usize] = hd.score;
+        if hd.pos.y == max_y - 1 && hd.pos.x == max_x - 1 {
+            break;
+        }
         match hd.dir {
             N | S => {
                 step(
@@ -130,7 +134,7 @@ fn solve(grid: &Vec<Vec<u32>>, amount_min: usize, amount_max: usize) -> u32 {
         .map(|v| v.iter().map(|_| [u32::MAX; VISITED]).collect())
         .collect();
 
-    let mut worklist = VecDeque::new();
+    let mut worklist = BTreeSet::new();
     let max_x = grid[0].len();
     let max_y = grid.len();
     step(
