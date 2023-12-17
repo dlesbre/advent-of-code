@@ -45,7 +45,6 @@ struct Head {
     score: u32,
     pos: P2,
     dir: Direction,
-    // amount: u8,
 }
 
 fn read_lines() -> Vec<Vec<u32>> {
@@ -58,6 +57,7 @@ fn read_lines() -> Vec<Vec<u32>> {
 
 fn step(
     grid: &Vec<Vec<u32>>,
+    visited: &mut Vec<Vec<[u32; VISITED]>>,
     pos: &P2,
     dir: &Direction,
     amount_min: usize,
@@ -68,14 +68,16 @@ fn step(
     worklist: &mut BTreeSet<Head>,
 ) {
     for amount in 1..=amount_max {
-        //println!("{}", amount);
         if let Some(p) = pos.step(amount, &dir, max_x, max_y) {
             score += grid[p.y][p.x];
             if amount >= amount_min {
+                if visited[p.y][p.x][*dir as usize & 1] <= score {
+                    continue;
+                }
+                visited[p.y][p.x][*dir as usize & 1] = score;
                 worklist.insert(Head {
                     pos: p,
                     dir: *dir,
-                    // amount: (amount - amount_min).try_into().unwrap(),
                     score,
                 });
             }
@@ -99,29 +101,30 @@ fn bfs(
     amount_max: usize,
 ) {
     while let Some(hd) = worklist.pop_first() {
-        //println!("At {:?}, {}", hd.pos, hd.amount);
-        if visited[hd.pos.y][hd.pos.x][hd.dir as usize & 1] <= hd.score {
-            continue;
-        }
-        visited[hd.pos.y][hd.pos.x][hd.dir as usize & 1] = hd.score;
+        // BTree ensures we see elements with lowest score first
+        // So we stop as soon as we reach the end
         if hd.pos.y == max_y - 1 && hd.pos.x == max_x - 1 {
             break;
         }
         match hd.dir {
             N | S => {
                 step(
-                    grid, &hd.pos, &E, amount_min, amount_max, hd.score, max_x, max_y, worklist,
+                    grid, visited, &hd.pos, &E, amount_min, amount_max, hd.score, max_x, max_y,
+                    worklist,
                 );
                 step(
-                    grid, &hd.pos, &W, amount_min, amount_max, hd.score, max_x, max_y, worklist,
+                    grid, visited, &hd.pos, &W, amount_min, amount_max, hd.score, max_x, max_y,
+                    worklist,
                 );
             }
             E | W => {
                 step(
-                    grid, &hd.pos, &N, amount_min, amount_max, hd.score, max_x, max_y, worklist,
+                    grid, visited, &hd.pos, &N, amount_min, amount_max, hd.score, max_x, max_y,
+                    worklist,
                 );
                 step(
-                    grid, &hd.pos, &S, amount_min, amount_max, hd.score, max_x, max_y, worklist,
+                    grid, visited, &hd.pos, &S, amount_min, amount_max, hd.score, max_x, max_y,
+                    worklist,
                 );
             }
         }
@@ -137,8 +140,10 @@ fn solve(grid: &Vec<Vec<u32>>, amount_min: usize, amount_max: usize) -> u32 {
     let mut worklist = BTreeSet::new();
     let max_x = grid[0].len();
     let max_y = grid.len();
+    // Initialize the worklist with rightwards and bottom steps
     step(
         &grid,
+        &mut visited,
         &P2 { x: 0, y: 0 },
         &E,
         amount_min,
@@ -150,6 +155,7 @@ fn solve(grid: &Vec<Vec<u32>>, amount_min: usize, amount_max: usize) -> u32 {
     );
     step(
         &grid,
+        &mut visited,
         &P2 { x: 0, y: 0 },
         &S,
         amount_min,
@@ -159,6 +165,7 @@ fn solve(grid: &Vec<Vec<u32>>, amount_min: usize, amount_max: usize) -> u32 {
         max_y,
         &mut worklist,
     );
+    // Run our bfs
     bfs(
         grid,
         &mut visited,
