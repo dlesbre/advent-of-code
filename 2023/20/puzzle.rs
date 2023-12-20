@@ -100,7 +100,8 @@ const ID_BROADCASTER: usize = 1;
 
 type Input = HashMap<usize, (Module, Vec<usize>)>;
 
-fn resolve_one(input: &mut Input, rx_id: usize) -> (PulseCount, bool) {
+/// Resolve a single button press, updating the state and counting pulses
+fn resolve_one(input: &mut Input) -> PulseCount {
     let mut worklist = VecDeque::new();
     worklist.push_back(Signal {
         from: 0,
@@ -108,17 +109,38 @@ fn resolve_one(input: &mut Input, rx_id: usize) -> (PulseCount, bool) {
         is_high: false,
     });
     let mut signals = PulseCount { low: 1, high: 0 };
-    let mut signaled_rx = false;
     while let Some(signal) = worklist.pop_front() {
-        if signal.to == rx_id && !signal.is_high {
-            signaled_rx = true;
-        }
         match input.get_mut(&signal.to) {
             None => (),
             Some((module, children)) => signals += module.receive(children, signal, &mut worklist),
         }
     }
-    (signals, signaled_rx)
+    signals
+}
+
+/// Number of button press needed to send signal that satisfies f
+fn presses_to_signal<F: Fn(&Signal) -> bool>(input: &mut Input, f: F) -> usize {
+    let mut count = 1;
+    loop {
+        let mut worklist = VecDeque::new();
+        worklist.push_back(Signal {
+            from: 0,
+            to: ID_BROADCASTER,
+            is_high: false,
+        });
+        while let Some(signal) = worklist.pop_front() {
+            if f(&signal) {
+                return count;
+            }
+            match input.get_mut(&signal.to) {
+                None => (),
+                Some((module, children)) => {
+                    module.receive(children, signal, &mut worklist);
+                }
+            }
+        }
+        count += 1;
+    }
 }
 
 fn read_lines() -> Vec<String> {
@@ -137,7 +159,17 @@ fn find_number<'a>(nb: &mut usize, map: &mut HashMap<&'a str, usize>, string: &'
     }
 }
 
-fn parse(lines: Vec<String>) -> (Input, usize) {
+fn parents(input: &Input, id: usize) -> Vec<usize> {
+    let mut parents = Vec::new();
+    for (keys, (_, children)) in input {
+        if children.contains(&id) {
+            parents.push(*keys);
+        }
+    }
+    parents
+}
+
+fn parse(lines: Vec<String>) -> (Input, Option<usize>) {
     let mut number = ID_BROADCASTER + 1;
     let mut strings = HashMap::new();
     let mut ret = HashMap::new();
@@ -176,31 +208,42 @@ fn parse(lines: Vec<String>) -> (Input, usize) {
             }
         }
     }
-    (ret, *strings.get("rx").unwrap())
+    (ret, strings.get("rx").map(|x| *x))
+}
+
+fn gcd(a: usize, b: usize) -> usize {
+    if b == 0 {
+        return a;
+    }
+    gcd(b, a % b)
+}
+
+fn lcm(a: usize, b: usize) -> usize {
+    (a / gcd(a, b)) * b
 }
 
 fn main() {
     let lines = read_lines();
-    let (mut input, rx_id) = parse(lines);
+    let (input, rx_id) = parse(lines);
+    let mut input1 = input.clone();
     let mut p1 = ZERO;
-    let mut found_rx = usize::MAX;
-    for i in 0..1000 {
-        let (signals, signaled_rx) = resolve_one(&mut input, rx_id);
-        p1 += signals;
-        if signaled_rx && found_rx == usize::MAX {
-            found_rx = i + 1;
-        }
+    for _ in 0..1000 {
+        p1 += resolve_one(&mut input1);
     }
     println!("Part 1 : {}", p1.low * p1.high);
-    if found_rx == usize::MAX {
-        let mut i = 1000;
-        let mut found = false;
-        while !found {
-            let (_, signaled_rx) = resolve_one(&mut input, rx_id);
-            found = signaled_rx;
-            i += 1;
-        }
-        found_rx = i;
+    if rx_id == None {
+        return;
     }
-    println!("Part 2 : {}", found_rx);
+    let rx_id = rx_id.unwrap();
+    // my input only has on parent of rx
+    // which is a conjuction
+    let x = parents(&input, rx_id).pop().unwrap();
+    let mut time_to_high = 1;
+    for y in parents(&input, x) {
+        time_to_high = lcm(
+            time_to_high,
+            presses_to_signal(&mut input.clone(), |x| x.from == y && x.is_high),
+        );
+    }
+    println!("Part 2 : {}", time_to_high);
 }
