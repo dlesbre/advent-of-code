@@ -7,7 +7,7 @@
 # Constants
 # ===================================================
 
-DAY = 20
+DAY = 21
 YEAR = 2023
 PART = 1
 
@@ -17,6 +17,8 @@ CARGO = cargo
 DIR = $(YEAR)/$(DAY)
 TARGET = $(DIR)/puzzle
 EXE = $(TARGET).exe
+
+DEBUG = on
 
 TIME = time -f "Stats:\n  Total time: %E\n  User Mode: %U\n  Kernel Mode: %S\n  CPU: %P\n  Memory (kB): %M"
 
@@ -30,11 +32,17 @@ COLOR = ON
 # should be > than the longest target
 HELP_PADDING = 15
 
-CARGO_TGT = ./target/debug/puzzle
-
 # ==================================================
 # Make code and variable setting
 # ==================================================
+
+ifeq ($(DEBUG),on)
+	CARGO_TGT = ./target/debug/puzzle
+	CARGO_BUILD = $(CARGO) build
+else
+	CARGO_TGT = ./target/release/puzzle
+	CARGO_BUILD = $(CARGO) build --release
+endif
 
 ifeq ($(YEAR),2022)
 	EXT = ml
@@ -79,7 +87,7 @@ $(EXE): $(CARGO_TGT)
 
 $(CARGO_TGT): $(TARGET).rs cargo
 	$(call print,Compiling $< with rust)
-	$(CARGO) build
+	$(CARGO_BUILD)
 
 # $(EXE): $(TARGET).rs
 # 	$(call print,Compiling $< with rust)
