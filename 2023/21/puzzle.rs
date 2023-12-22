@@ -88,6 +88,15 @@ fn do_n_steps(input: &Vec<Vec<Tile>>, x: usize, y: usize, nb: usize) -> usize {
     return reached.len();
 }
 
+/// Smallest even number greater than num
+fn even(num: usize) -> usize {
+    if num | 1 != 0 {
+        num + 1
+    } else {
+        num
+    }
+}
+
 fn main() {
     let mut input = read_lines();
     let (start_x, start_y) = find_start(&input);
@@ -141,8 +150,9 @@ fn main() {
         (nb_truncated * nb_truncated, diamond_width * diamond_width)
     };
 
-    let same_parity_plots = do_n_steps(&input, start_x, start_y, input_size * 2 + STEPS % 2);
-    let flipped_parity_plots = do_n_steps(&input, start_x, start_y, input_size * 2 + 1 - STEPS % 2);
+    let same_parity_plots = do_n_steps(&input, start_x, start_y, even(input_size) + STEPS % 2);
+    let flipped_parity_plots =
+        do_n_steps(&input, start_x, start_y, even(input_size) + 1 - STEPS % 2);
 
     // Nb of steps after last boundary (into cardinal squares and T squares)
     let boundary_steps = (STEPS - input_size / 2 - 1) % input_size;
