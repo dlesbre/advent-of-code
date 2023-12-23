@@ -88,7 +88,7 @@ fn find_path(line: &Vec<Tile>) -> usize {
     panic!("No path on line")
 }
 
-use std::collections::{HashSet, VecDeque};
+use std::collections::{HashMap, VecDeque};
 
 // Part 1 : naive DFS, very heavy memory usage if used directly for part2
 // as the set of visited states if fully copied at each intersection
@@ -194,59 +194,7 @@ fn next_intersection(
     }
 }
 
-use std::collections::HashMap;
-
 type Point = usize;
-
-// Returns a vector such that v[i].0 are intersection
-// And v[i].1 is a list of (adjacent intersections, distance)
-// Also returns end id
-fn map_of_intersections(
-    grid: &Vec<Vec<Tile>>,
-    start: P2,
-    end: P2,
-    max_x: usize,
-    max_y: usize,
-) -> (Vec<Vec<(Point, usize)>>, Point) {
-    let mut worklist = VecDeque::new();
-    let mut intersections_ids = HashMap::new();
-    let mut intersections = Vec::new();
-    let mut seen = HashSet::new();
-
-    worklist.push_back((start, 0));
-    intersections_ids.insert(start, 0);
-    intersections.push(Vec::new());
-    seen.insert(0);
-
-    while let Some((pos, id)) = worklist.pop_front() {
-        // println!("Seeing intersection {:?}", pos);
-        for dir in DIRECTIONS {
-            match pos.step(1, &dir, max_x, max_y) {
-                Some(p) if grid[p.y][p.x] != Forest => {
-                    // println!("Going {:?}", dir);
-                    let (p, dist) = next_intersection(grid, p, dir, max_x, max_y);
-                    let id_p = match intersections_ids.get(&p) {
-                        Some(i) => *i,
-                        None => {
-                            let i = intersections.len();
-                            intersections.push(Vec::new());
-                            intersections_ids.insert(p, i);
-                            i
-                        }
-                    };
-                    intersections[id].push((id_p, dist));
-                    if !seen.contains(&id_p) {
-                        seen.insert(id_p);
-                        worklist.push_back((p, id_p));
-                    }
-                    // sleep(Duration::from_secs(1));
-                }
-                _ => (),
-            }
-        }
-    }
-    return (intersections, *intersections_ids.get(&end).unwrap());
-}
 
 #[derive(Clone, Copy)]
 struct BoolSet(u64);
@@ -269,6 +217,56 @@ impl BoolSet {
     //     let BoolSet(set) = self;
     //     *set &= !(1 << pos);
     // }
+}
+
+// Returns a vector such that v[i].0 are intersection
+// And v[i].1 is a list of (adjacent intersections, distance)
+// Also returns end id
+fn map_of_intersections(
+    grid: &Vec<Vec<Tile>>,
+    start: P2,
+    end: P2,
+    max_x: usize,
+    max_y: usize,
+) -> (Vec<Vec<(Point, usize)>>, Point) {
+    let mut worklist = VecDeque::new();
+    let mut intersections_ids = HashMap::new();
+    let mut intersections = Vec::new();
+    let mut seen = BoolSet(0);
+
+    worklist.push_back((start, 0));
+    intersections_ids.insert(start, 0);
+    intersections.push(Vec::new());
+    seen.set(0);
+
+    while let Some((pos, id)) = worklist.pop_front() {
+        // println!("Seeing intersection {:?}", pos);
+        for dir in DIRECTIONS {
+            match pos.step(1, &dir, max_x, max_y) {
+                Some(p) if grid[p.y][p.x] != Forest => {
+                    // println!("Going {:?}", dir);
+                    let (p, dist) = next_intersection(grid, p, dir, max_x, max_y);
+                    let id_p = match intersections_ids.get(&p) {
+                        Some(i) => *i,
+                        None => {
+                            let i = intersections.len();
+                            intersections.push(Vec::new());
+                            intersections_ids.insert(p, i);
+                            i
+                        }
+                    };
+                    intersections[id].push((id_p, dist));
+                    if !seen.get(id_p) {
+                        seen.set(id_p);
+                        worklist.push_back((p, id_p));
+                    }
+                    // sleep(Duration::from_secs(1));
+                }
+                _ => (),
+            }
+        }
+    }
+    return (intersections, *intersections_ids.get(&end).unwrap());
 }
 
 fn dfs(
@@ -311,7 +309,7 @@ fn main() {
 
     let (intersections, end_id) = map_of_intersections(&grid, start, end, max_x, max_y);
 
-    // End has a unique parent node, so stop when we reach that
+    // End has a unique parent node, so stop when we reach
     let (pre_end_id, steps) = intersections[end_id][0];
     let p2 = dfs(&intersections, pre_end_id, 0, steps, BoolSet(0));
     println!("Part 2 : {}", p2);
