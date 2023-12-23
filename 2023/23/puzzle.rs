@@ -264,11 +264,11 @@ impl BoolSet {
         *set |= 1 << pos;
     }
 
-    #[inline]
-    fn unset(&mut self, pos: usize) {
-        let BoolSet(set) = self;
-        *set &= !(1 << pos);
-    }
+    // #[inline]
+    // fn unset(&mut self, pos: usize) {
+    //     let BoolSet(set) = self;
+    //     *set &= !(1 << pos);
+    // }
 }
 
 fn dfs(
@@ -276,27 +276,19 @@ fn dfs(
     end_id: Point,
     pos: Point,
     length: usize,
-    max_path: &mut Vec<usize>,
     mut visited: BoolSet,
-) {
-    max_path[pos] = std::cmp::max(max_path[pos], length);
+) -> usize {
     if pos == end_id {
-        return;
+        return length;
     }
     visited.set(pos);
+    let mut max = 0;
     for (point, dist) in &intersections[pos] {
         if !visited.get(*point) {
-            dfs(
-                intersections,
-                end_id,
-                *point,
-                length + *dist,
-                max_path,
-                visited,
-            );
+            max = max.max(dfs(intersections, end_id, *point, length + *dist, visited));
         }
     }
-    visited.unset(pos);
+    max
 }
 
 fn main() {
@@ -319,19 +311,8 @@ fn main() {
 
     let (intersections, end_id) = map_of_intersections(&grid, start, end, max_x, max_y);
 
-    let mut max_path = Vec::with_capacity(intersections.len());
-    for _ in &intersections {
-        max_path.push(0);
-    }
-
+    // End has a unique parent node, so stop when we reach that
     let (pre_end_id, steps) = intersections[end_id][0];
-    dfs(
-        &intersections,
-        pre_end_id,
-        0,
-        steps,
-        &mut max_path,
-        BoolSet(0),
-    );
-    println!("Part 2 : {}", max_path[pre_end_id]);
+    let p2 = dfs(&intersections, pre_end_id, 0, steps, BoolSet(0));
+    println!("Part 2 : {}", p2);
 }
