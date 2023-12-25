@@ -74,7 +74,6 @@ struct Stone {
 // }
 
 fn parse_p3(string: &str) -> P3 {
-    //println!("{}", string);
     let mut iter = string.split(", ");
     let x = iter.next().unwrap().trim().parse().unwrap();
     let y = iter.next().unwrap().trim().parse().unwrap();
@@ -112,11 +111,6 @@ fn intersects(s: &Stone, t: &Stone) -> (f64, f64) {
     // as = s.velocity.y / s.velocity.x
     // bs = (s.position.x - s.velocity.x) *
     let (a_s, b_s) = equation(s);
-    // println!(
-    //     "Foo {} : {}",
-    //     s.position.y,
-    //     a_s * (s.position.x as f64) + b_s
-    // );
     let (a_t, b_t) = equation(t);
     let x = (b_t - b_s) / (a_s - a_t);
     let y = a_s * x + b_s;
@@ -223,17 +217,8 @@ fn equation_system(v0: &Stone, v1: &Stone) -> (Vec<Vec<i64>>, Vec<i64>) {
 // }
 
 fn solve_system(mut matrix: Vec<Vec<F>>, mut equals: Vec<F>) -> Vec<F> {
-    //print_matrix(&matrix, &equals);
     for pos in 0..matrix.len() {
         let mut found_non_null = false;
-        // for j in (pos)..matrix.len() {
-        //     if matrix[j][pos] == 1 || matrix[j][pos] == -1. {
-        //         matrix.swap(j, pos);
-        //         equals.swap(j, pos);
-        //         found_non_null = true;
-        //         break;
-        //     }
-        // }
         if !found_non_null {
             for j in (pos)..matrix.len() {
                 if matrix[j][pos] != F::from(0) {
@@ -248,8 +233,6 @@ fn solve_system(mut matrix: Vec<Vec<F>>, mut equals: Vec<F>) -> Vec<F> {
             }
         }
         let coeff = matrix[pos][pos].clone();
-        //println!("coeff {}", coeff);
-        //print_matrix(&matrix, &equals);
         for j in (pos + 1)..matrix.len() {
             let scale = matrix[j][pos].clone() / coeff.clone();
             for i in pos..(matrix[j].len()) {
@@ -268,7 +251,6 @@ fn solve_system(mut matrix: Vec<Vec<F>>, mut equals: Vec<F>) -> Vec<F> {
         // The solution should be an integer
         let res = equals[pos].clone() / matrix[pos][pos].clone();
         //assert!(res.round() == res);
-        println!("{}", res);
         for j in 0..pos {
             equals[j] -= res.clone() * matrix[j][pos].clone();
         }
@@ -285,7 +267,6 @@ fn main() {
     for i in 0..input.len() {
         for j in 0..i {
             let (x, y) = intersects(&input[i], &input[j]);
-            //println!("{}, {}", x, y);
             if test_min <= x
                 && x <= test_max
                 && test_min <= y
