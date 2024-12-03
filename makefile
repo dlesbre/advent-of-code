@@ -7,11 +7,11 @@
 # Constants
 # ===================================================
 
-DAY = 25
-YEAR = 2023
+DAY = 03
+YEAR = 2024
 PART = 1
 
-OCAMLC = ocamlc
+OCAMLC = ocamlc -I +str str.cma
 RUSTC = rustc --cfg 'part="$(PART)"'
 CARGO = cargo
 DIR = $(YEAR)/$(DAY)
@@ -81,6 +81,7 @@ $(EXE): $(TARGET).ml
 	$(OCAMLC) $< -o $@
 
 else
+ifeq ($(YEAR),2023)
 
 $(EXE): $(CARGO_TGT)
 	cp "$(CARGO_TGT)" "$(EXE)"
@@ -93,6 +94,13 @@ $(CARGO_TGT): $(TARGET).rs cargo
 # 	$(call print,Compiling $< with rust)
 # 	$(RUSTC) $< -o $@
 
+else
+
+$(EXE): $(TARGET).ml
+	$(call print,Compiling $< with ocaml)
+	$(OCAMLC) $< -o $@
+
+endif
 endif
 
 # =================================================
@@ -135,6 +143,6 @@ help: ## Show this help
 init: ## Create files for the new day
 	$(call print,Creating files for day $(DAY))
 	mkdir $(DIR)
-	echo "// ==== Puzzle $(DAY) : https://adventofcode.com/$(YEAR)/day/$(DAY) ====" > $(TARGET).$(EXT)
+	echo "(* ==== Puzzle $(DAY) : https://adventofcode.com/$(YEAR)/day/$(DAY) ====  *)" > $(TARGET).$(EXT)
 	touch $(TARGET)_data.txt
 	touch $(TARGET)_test.txt
