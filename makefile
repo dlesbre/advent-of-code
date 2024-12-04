@@ -7,7 +7,7 @@
 # Constants
 # ===================================================
 
-DAY = 03
+DAY = 04
 YEAR = 2024
 PART = 1
 
@@ -44,12 +44,6 @@ else
 	CARGO_BUILD = $(CARGO) build --release
 endif
 
-ifeq ($(YEAR),2022)
-	EXT = ml
-else
-	EXT = rs
-endif
-
 ifeq ($(COLOR),ON)
 	color_yellow = \033[93;1m
 	color_orange = \033[33m
@@ -75,14 +69,14 @@ default: run-test
 # =================================================
 
 ifeq ($(YEAR),2022)
-
+EXT = ml
 $(EXE): $(TARGET).ml
 	$(call print,Compiling $< with ocaml)
 	$(OCAMLC) $< -o $@
 
 else
 ifeq ($(YEAR),2023)
-
+EXT = rs
 $(EXE): $(CARGO_TGT)
 	cp "$(CARGO_TGT)" "$(EXE)"
 
@@ -95,7 +89,7 @@ $(CARGO_TGT): $(TARGET).rs cargo
 # 	$(RUSTC) $< -o $@
 
 else
-
+EXT = ml
 $(EXE): $(TARGET).ml
 	$(call print,Compiling $< with ocaml)
 	$(OCAMLC) $< -o $@
