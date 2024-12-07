@@ -16,12 +16,9 @@ let parse_line line =
       }
     | _ -> failwith "Invalid format"
 
-
 let rec read_all_lines acc =
-  try
-    read_all_lines (read_line ()::acc)
-  with End_of_file ->
-    List.rev_map parse_line acc
+  try read_all_lines (read_line ()::acc)
+  with End_of_file -> List.rev_map parse_line acc
 
 let rec solvable total partial_total = function
   | [] -> total = partial_total
@@ -44,8 +41,7 @@ let rec solvable_with_cat total partial_total = function
       (using_prod <= total && solvable_with_cat total using_prod ns)
       ||
       let using_cat = cat partial_total n 10 in
-      (using_cat <= total && solvable_with_cat   total using_cat ns)
-
+      (using_cat <= total && solvable_with_cat total using_cat ns)
 
 let main () =
   let input = read_all_lines [] in
