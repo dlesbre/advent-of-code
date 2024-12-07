@@ -1,4 +1,4 @@
-(* ==== Puzzle 06 : https://adventofcode.com/2024/day/06 ====  *)
+(* ==== Puzzle 06 : https://adventofcode.com/2024/day/0  | None -> Some positions6 ====  *)
 
 type direction = N | E | S | W
 
@@ -62,13 +62,15 @@ let pp fmt = function
 
 let ( +| ) (x,y) (x', y') = (x+x', y+y')
 
+exception Out_of_bounds
+
 let grid_get_opt grid (x, y) =
   if 0 <= y && y < Array.length grid
   then let line = grid.(y) in
        if 0 <= x && x < Array.length line
-       then Some line.(x)
-       else None
-  else None
+       then line.(x)
+       else raise Out_of_bounds
+  else raise Out_of_bounds
 
 let grid_print grid =
   Array.iter (fun line ->
@@ -89,18 +91,18 @@ let grid_print grid =
 let rec patrol grid direction positions pos =
   let newpos = pos +| offset direction in
   match grid_get_opt grid newpos with
-  | None -> Some positions
-  | Some Full -> patrol grid (rotate_right direction) positions pos
-  | Some Empty ->
+  | Full -> patrol grid (rotate_right direction) positions pos
+  | Empty ->
       grid.(snd newpos).(fst newpos) <- Guard (DirectionSet.singleton direction);
       patrol grid direction (positions+1) newpos
-  | Some (Guard s) ->
+  | (Guard s) ->
       if DirectionSet.mem direction s
       then None (* Loop *)
       else (
         grid.(snd newpos).(fst newpos) <- Guard (DirectionSet.add direction s);
         patrol grid direction positions newpos
       )
+  | exception Out_of_bounds -> Some positions
 
 let grid_foldi (f : int * int -> 'a -> 'acc -> 'acc) (init: 'acc) (a : 'a array array) =
   Array.fold_left (fun (acc, y) line ->

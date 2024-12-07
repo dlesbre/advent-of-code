@@ -1,4 +1,4 @@
-(* ==== Puzzle 07 : https://adventofcode.com/2024/day/07 ====  *)
+(* ==== Puzzle 07 : https://adventofcode.com/2024/day/7 ====  *)
 
 type equation = {
   total: int;
