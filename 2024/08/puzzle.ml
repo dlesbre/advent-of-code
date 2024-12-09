@@ -1,4 +1,4 @@
-(* ==== Puzzle 08 : https://adventofcode.com/2024/day/08 ====  *)
+(* ==== Puzzle 08 : https://adventofcode.com/2024/day/8 ====  *)
 
 module Vec2 : sig
   type t = int * int
