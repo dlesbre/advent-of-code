@@ -2,7 +2,7 @@
 
 type content =
   | Empty of int
-  | File of int * int
+  | File of int * int (** id, size *)
 
 let int_of_char x = int_of_char x - int_of_char '0'
 
@@ -14,15 +14,11 @@ let parse line =
     )
 
 (** Sum of integers in [low..high] inclusive *)
-let int_sum low high =(high-low+1) * (high+low) / 2
-  (* let n = (high-low+1) * (high+low) / 2 in
-  Format.printf "        Sum %d..%d = %d@." low high n;
-  n *)
+let int_sum low high = (high-low+1) * (high+low) / 2
 
 (** We iterate from the ends towards the center
     - [left] is the position of the left cursor the array, [right] that of the right cursor
-    - [pos] is the position from the start of the filesystem (number of blocks)
-    - [remain] is non-zero if the current right chunk is only partially consumed *)
+    - [pos] is the position from the start of the filesystem (number of blocks)*)
 let rec part1 array total left pos right =
   if left >= right then
     match array.(left) with
@@ -32,17 +28,13 @@ let rec part1 array total left pos right =
   else
     match array.(left) with
     | File(id, size) ->
-      (* Format.printf "%d => Left file %d,%d@." total id size; *)
         part1 array (total + id*(int_sum pos (pos+size-1)))
           (left+1) (pos+size) right
     | Empty size ->
-        (* Format.printf "%d => Left Empty %d@." total  size; *)
         match array.(right) with
         | Empty _ ->
-            (* Format.printf "    Right Empty@."; *)
             part1 array total left pos (right-1)
         | File(id, size') ->
-            (* Format.printf "    Right File %d,%d@." id size'; *)
             if size >= size' then (
               array.(left) <- Empty (size-size');
               part1 array (total + id*(int_sum pos (pos+size'-1))) left (pos+size') (right-1)
@@ -56,13 +48,14 @@ let size = function
   | Empty size -> size
   | File (_, size) -> size
 
+(** Precomputed filesystem position for each element of the old array
+    ex: [positions [|File(_,3); Empty 5; File _]|] = [|0;3;3+5|]]  *)
 let positions array =
   let total = ref 0 in
   Array.init (Array.length array) (fun i ->
     let tmp = !total in
     total := !total + size array.(i);
-    tmp
-    )
+    tmp)
 
 (** Array fold_right with position*)
 let array_fold_right_i f array acc =
@@ -71,19 +64,19 @@ let array_fold_right_i f array acc =
     ) array (acc, Array.length array - 1) |> fst
 
 let part2 array =
-  (* find an empty spot with the correct size before max_pos, starting at pos *)
+  (* find an empty spot with sufficient size before max_pos, starting at pos *)
   let rec find_empty size max_pos pos =
     if pos > max_pos
     then None
     else match array.(pos) with
     | File _ -> failwith "Only empty at odd positions"
     | Empty n when n >= size ->
-          array.(pos) <- Empty (n-size);
+          array.(pos) <- Empty (n-size); (* Shrink the free block *)
           Some pos
-    | Empty _ -> find_empty size max_pos (pos+2)
+    | Empty _ -> find_empty size max_pos (pos+2) (* Empty are at odd positions *)
   in
   (* Memoization: empty[i] is the first empty that MAY fit a block of size i. *)
-  let emptys = Array.make 10 (Some 1) in
+  let emptys = Array.make 10 (Some 1) in (* start at odd positions *)
   let find_empty size max_pos = match emptys.(size) with
     | None -> None
     | Some pos -> let opt = find_empty size max_pos pos in
@@ -91,18 +84,16 @@ let part2 array =
                   opt
   in
   let positions = positions array in
-  array_fold_right_i (fun elt pos total -> match elt with
+  array_fold_right_i (fun elt i total -> match elt with
     | Empty _ -> total
     | File(id, size) ->
-        let pos = match find_empty size pos with
-        | None -> positions.(pos)
+        let new_pos = match find_empty size i with
+        | None -> positions.(i)
         | Some i -> let n = positions.(i) in
                     positions.(i) <- positions.(i) + size;
                     n
-        in total + id*(int_sum pos (pos+size-1))
+        in total + id*(int_sum new_pos (new_pos+size-1))
   ) array 0
-
-
 
 let main () =
   let line = read_line () in
@@ -110,6 +101,5 @@ let main () =
   let p1 = part1 (Array.copy array) 0 0 0 (Array.length array -1) in
   Format.printf "Part 1 : %d@." p1;
   Format.printf "Part 2 : %d@." (part2 array)
-
 
 let () = main ()
