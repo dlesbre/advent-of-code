@@ -1,9 +1,14 @@
 a.out
 *.exe
 
-# Ocaml build files
+# ocamlc build files
 *.cmi
 *.cmo
+
+# ocamlopt build files
+*.cmx
+*.o
+
 
 # Cargo files
 target
