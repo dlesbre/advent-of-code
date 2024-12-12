@@ -7,7 +7,7 @@
 # Constants
 # ===================================================
 
-DAY = 10
+DAY = 12
 YEAR = 2024
 PART = 1
 
@@ -20,7 +20,7 @@ EXE = $(TARGET).exe
 
 DEBUG = on
 
-TIME = time -f "Stats:\n  Total time: %E\n  User Mode: %U\n  Kernel Mode: %S\n  CPU: %P\n  Memory (kB): %M"
+TIME = time -f "Stats:\n  Total time: %E\n  CPU: %P\n  Memory (kB): %M"
 
 # set to ON/OFF to toggle ANSI escape sequences
 COLOR = ON
@@ -127,6 +127,8 @@ clean: ## Remove build files and executables
 	find . -type f -name '*.exe' -delete
 	find . -type f -name '*.cmo' -delete
 	find . -type f -name '*.cmi' -delete
+	find . -type f -name '*.o' -delete
+	find . -type f -name '*.cmx' -delete
 
 .PHONY: help
 help: ## Show this help

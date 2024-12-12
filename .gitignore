@@ -9,7 +9,6 @@ a.out
 *.cmx
 *.o
 
-
 # Cargo files
 target
 Cargo.lock
