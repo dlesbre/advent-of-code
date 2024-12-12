@@ -2,7 +2,7 @@
 
 # Advent of Code
 
-Puzzle solutions for [advent of code 2022](https://adventofcode.com/2022/) and [2024](ttps://adventofcode.com/2024), in OCaml, as well as [advent of code 2023](https://adventofcode.com/2023/), in Rust.
+Puzzle solutions for [advent of code 2022](https://adventofcode.com/2022/) and [2024](https://adventofcode.com/2024), in OCaml, as well as [advent of code 2023](https://adventofcode.com/2023/), in Rust.
 Most run under 1s, all run under 5 minutes.
 
 Building just requires a not too old [ocamlopt](https://v2.ocaml.org/docs/install.html)
