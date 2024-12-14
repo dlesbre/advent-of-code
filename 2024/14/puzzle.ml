@@ -282,12 +282,34 @@ let rec find_tree robots size n =
   Unix.sleepf 0.2;
   find_tree robots size (n+6)
 
+let rec explore_component grid seen elt pos =
+  let rec depth_explore pos elt area =
+    match elt with
+    | 0 -> area
+    | _ -> if Hashtbl.mem seen pos then area
+           else (
+              Hashtbl.add seen pos ();
+              Grid.fold_adjacent (fun _ -> depth_explore) (area+1) pos grid)
+  in depth_explore pos elt 0
+
+
+let rec find_tree_smart robots size n =
+  let grid = to_grid (List.map (calc_position n size) robots) size in
+  let seen = Hashtbl.create (let n = Grid.lines grid in n*n) in
+  let max_size = Grid.foldi (fun pos elt max_size ->
+    if elt = 0 then max_size
+    else max max_size (explore_component grid seen elt pos)) 0 grid in
+  if max_size > 100 then
+    Format.printf "Grid at step %d:@.%a@." n (Grid.pp (fun fmt n -> if n = 0 then Format.fprintf fmt " " else Format.fprintf fmt "#")) grid
+  else find_tree_smart robots size (n+1)
+
+
 
 let main () =
   let robots = read_all_lines [] in
   let size = true_size in
   let new_positions = List.map (calc_position 100 size) robots in
   Format.printf "Part 1 : %d@." (quadrant_sum size new_positions);
-  find_tree robots size 7000
+  find_tree_smart robots size 7000
 
 let () = main ()
