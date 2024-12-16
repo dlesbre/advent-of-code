@@ -9,6 +9,10 @@ a.out
 *.cmx
 *.o
 
+# dune build files
+_build/
+*.opam
+
 # Cargo files
 target
 Cargo.lock

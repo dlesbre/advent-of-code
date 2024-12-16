@@ -7,14 +7,14 @@
 # Constants
 # ===================================================
 
-DAY = 16
+DAY = 01
 YEAR = 2024
 PART = 1
 
 OCAMLC = ocamlopt -I +str str.cmxa -I +unix unix.cmxa -O2
 RUSTC = rustc --cfg 'part="$(PART)"'
 CARGO = cargo
-DIR = $(YEAR)/$(DAY)
+DIR = $(YEAR)/Day$(DAY)
 TARGET = $(DIR)/puzzle
 EXE = $(TARGET).exe
 
@@ -70,6 +70,7 @@ default: run-test
 
 ifeq ($(YEAR),2022)
 EXT = ml
+BEXE = ./$(EXE)
 $(EXE): $(TARGET).ml
 	$(call print,Compiling $< with ocaml)
 	$(OCAMLC) $< -o $@
@@ -77,6 +78,7 @@ $(EXE): $(TARGET).ml
 else
 ifeq ($(YEAR),2023)
 EXT = rs
+BEXE = ./$(EXE)
 $(EXE): $(CARGO_TGT)
 	cp "$(CARGO_TGT)" "$(EXE)"
 
@@ -90,9 +92,9 @@ $(CARGO_TGT): $(TARGET).rs cargo
 
 else
 EXT = ml
+BEXE = dune exec -- advent_of_code $(YEAR) $(DAY)
 $(EXE): $(TARGET).ml
-	$(call print,Compiling $< with ocaml)
-	$(OCAMLC) $< -o $@
+	dune build
 
 endif
 endif
@@ -114,12 +116,12 @@ compile: $(EXE) ## Compile the given puzzle
 .PHONY: run-test
 run-test: $(EXE) ## Compile and run with test data
 	$(call print,Running $< with test data)
-	$(TIME) ./$(EXE) < $(TARGET)_test.txt
+	$(TIME) $(BEXE) < $(TARGET)_test.txt
 
 .PHONY: run
 run: $(EXE) ## Compile and run with input data
 	$(call print,Running $< with input data)
-	$(TIME) ./$(EXE) < $(TARGET)_data.txt
+	$(TIME) $(BEXE) < $(TARGET)_data.txt
 
 .PHONY: clean
 clean: ## Remove build files and executables

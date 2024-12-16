@@ -1,0 +1,9 @@
+(library
+ (name AOC)
+ (modules :standard \ advent_of_code))
+
+(executable
+ (name advent_of_code)
+ (public_name advent_of_code)
+ (libraries AOC AOC2024)
+ (modules advent_of_code))
