@@ -2,6 +2,6 @@
  (name AOC2024)
  (libraries AOC str unix)
  (library_flags :standard -linkall)
- (flags :standard -warn-error -A -open AOC))
+ (flags :standard -warn-error -A -open AOC -open AOC.Utils))
 
 (include_subdirs qualified)

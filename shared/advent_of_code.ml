@@ -20,4 +20,4 @@ let () = Arg.parse [] anon_fun usage_msg
 let () =
   match !year, !day with
   | None, _ | _, None -> Format.eprintf "Missing year/day"
-  | Some year, Some day -> AOC.run_solution ~year ~day
+  | Some year, Some day -> AOC.Utils.run_solution ~year ~day

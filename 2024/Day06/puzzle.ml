@@ -5,12 +5,13 @@ type tile = Empty | Full | Guard of Grid.DirectionSet.t
 let startpos = ref None
 
 let preprocess input =
-  Grid.parse (fun pos char ->
+  let grid = Grid.parse (fun pos char ->
     match char with
     | '.' -> Empty
     | '#' -> Full
     | '^' -> startpos := Some pos; Guard Grid.(DirectionSet.singleton N)
-    | _ -> failwith "Invalid input") input
+    | _ -> failwith "Invalid input") input in
+  grid, Grid.copy grid
 
 open Vec2
 
@@ -30,14 +31,14 @@ let rec patrol grid direction positions pos =
       )
   | exception Grid.Out_of_bounds -> Some positions
 
-let part1 grid = Option.get @@ patrol (Grid.copy grid) Grid.N 1 (Option.get !startpos)
-let part2 grid =
+let part1 (grid,_) = Option.get @@ patrol grid Grid.N 1 (Option.get !startpos)
+let part2 (grid, grid_copy) =
   let startpos = Option.get !startpos in
   Grid.foldi(fun pos elt total ->
   match elt with
   | Guard _ ->
     if pos = startpos then total else
-      let grid' = Grid.copy grid in
+      let grid' = Grid.copy grid_copy in
       Grid.set grid' pos Full;
       if patrol grid' N 1 startpos = None
       then total + 1

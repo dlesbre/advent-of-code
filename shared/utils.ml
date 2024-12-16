@@ -48,7 +48,6 @@ let register_int ~year ~day ~preprocess ~part1 ~part2 =
 
 
 let run_solution ~year ~day =
-  Format.printf "%d@." (List.length !solutions);
   match List.assoc (year, day) !solutions with
   | Wrapped{preprocess;part1;part2} ->
       Format.printf "Running puzzle %4d, day %2d@." year day;
