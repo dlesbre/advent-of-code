@@ -5,6 +5,7 @@ module type S = sig
   val singleton: elt -> t
   val mem: elt -> t -> bool
   val add: elt -> t -> t
+  val remove: elt -> t -> t
   val union: t -> t -> t
   val inter: t -> t -> t
 end
@@ -19,6 +20,15 @@ end) : S with type elt = Elt.t = struct
   let empty = 0
   let add x s = singleton x lor s
   let mem x s = singleton x land s <> 0
+  let remove x s = s land (lnot (singleton x))
   let union a b = a lor b
   let inter a b = a land b
 end
+
+module MakeGeneric(Elt: sig type t end) = Make(struct
+  include Elt
+  let singleton x =
+    let repr = Obj.repr x in
+    assert (Obj.tag repr = Obj.int_tag);
+    1 lsl (Obj.magic x)
+end)

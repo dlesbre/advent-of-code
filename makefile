@@ -7,14 +7,18 @@
 # Constants
 # ===================================================
 
-DAY = 01
+DAY = 17
 YEAR = 2024
 PART = 1
 
 OCAMLC = ocamlopt -I +str str.cmxa -I +unix unix.cmxa -O2
 RUSTC = rustc --cfg 'part="$(PART)"'
 CARGO = cargo
-DIR = $(YEAR)/Day$(DAY)
+ifeq ($(YEAR),2024)
+	DIR = $(YEAR)/Day$(DAY)
+else
+	DIR = $(YEAR)/$(DAY)
+endif
 TARGET = $(DIR)/puzzle
 EXE = $(TARGET).exe
 
@@ -131,6 +135,7 @@ clean: ## Remove build files and executables
 	find . -type f -name '*.cmi' -delete
 	find . -type f -name '*.o' -delete
 	find . -type f -name '*.cmx' -delete
+	dune clean
 
 .PHONY: help
 help: ## Show this help
@@ -142,5 +147,12 @@ init: ## Create files for the new day
 	$(call print,Creating files for day $(DAY))
 	mkdir $(DIR)
 	echo "(* ==== Puzzle $(DAY) : https://adventofcode.com/$(YEAR)/day/$(DAY) ====  *)" > $(TARGET).$(EXT)
+	echo "" >> $(TARGET).$(EXT)
+	echo "let preprocess input = input" >> $(TARGET).$(EXT)
+	echo "" >> $(TARGET).$(EXT)
+	echo "let part1 input = 0" >> $(TARGET).$(EXT)
+	echo "let part2 input = 0" >> $(TARGET).$(EXT)
+	echo "" >> $(TARGET).$(EXT)
+	echo "let () = register_int ~year:$(YEAR) ~day:$(DAY) ~preprocess ~part1 ~part2" >> $(TARGET).$(EXT)
 	touch $(TARGET)_data.txt
 	touch $(TARGET)_test.txt

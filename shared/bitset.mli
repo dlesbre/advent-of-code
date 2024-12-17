@@ -9,6 +9,7 @@ module type S = sig
   val singleton: elt -> t
   val mem: elt -> t -> bool
   val add: elt -> t -> t
+  val remove: elt -> t -> t
   val union: t -> t -> t
   val inter: t -> t -> t
 end
@@ -18,3 +19,5 @@ module Make(Elt:sig
   val singleton: t -> int
   (** Should map each element to a separate power of 2*)
 end) : S with type elt = Elt.t
+
+module MakeGeneric(Elt: sig type t (** should only have constant constructors *) end) : S with type elt = Elt.t
