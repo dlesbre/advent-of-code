@@ -35,20 +35,6 @@ let instruction = function
   | 7 -> Cdv
   | _ -> failwith "Invalid instruction"
 
-(*
-2,4, B = A & 0b111 (Bst 4)
-1,5, B = B xor 0b101 (Bxl 5) = A & 0b111 xor 0b101
-7,5, C = A >> B      (Cdv 5) =
-4,3, B = B xor C
-1,6, B = B xor 0b110 (Bxl 6)
-0,3, A = A >> 3      (Adv 3)
-5,5, out B
-3,0  goto 0 if A non-zero
-
-
-
-*)
-
 let step operation operand memory = match operation with
   | Adv -> set_reg memory A (memory.register_A lsr (combo_operand memory operand))
   | Bxl -> set_reg memory B (memory.register_B lxor operand)
@@ -78,7 +64,7 @@ let rec part1 (memory, array) =
   | Some operand ->
     (* Format.printf "A=%d; B=%d; C=%d; op=%d; operand=%d" memory.register_A memory.register_B memory.register_C  *)
     part1 (step (instruction array.(memory.pc)) operand memory, array)
-
+(*
 module IntSet = Set.Make(Int)
 
 type bit =
@@ -140,7 +126,7 @@ let combo_operand memory = function
   | 4 -> memory.register_A
   | 5 -> memory.register_B
   | 6 -> memory.register_C
-  | _ -> failwith "Invalid combo operand"
+  | _ -> failwith "Invalid combo operand" *)
 
 (* let step2 operation operand memory =
   let open SymbolicInt in
@@ -153,6 +139,27 @@ let combo_operand memory = function
   | Out -> { memory with out = (combo_operand memory operand land 0b111)::memory.out; pc=memory.pc+2 }
   | Bdv -> set_reg memory B (memory.register_A lsr (combo_operand memory operand))
   | Cdv -> set_reg memory C (memory.register_A lsr (combo_operand memory operand)) *)
+
+(*
+2,4, B = A & 0b111 (Bst 4)
+1,5, B = B xor 0b101 (Bxl 5) = A & 0b111 xor 0b101
+7,5, C = A >> B      (Cdv 5) =
+4,3, B = B xor C
+1,6, B = B xor 0b110 (Bxl 6)
+0,3, A = A >> 3      (Adv 3)
+5,5, out B
+3,0  goto 0 if A non-zero
+
+=> printed value at each loop only depends on the low 6 bits of A
+*)
+
+let condensed_function (memory,array) =
+  let table = Hashtbl.create 1000 in
+  let add_to_values
+  for i
+
+let rec tryall high_A out_target =
+  match out
 
 let part2 (memory,array) =
   for i = 0 to Array.length array / 2 do
