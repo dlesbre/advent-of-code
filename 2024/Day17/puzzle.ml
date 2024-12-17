@@ -61,110 +61,52 @@ let preprocess = function
 let rec part1 (memory, array) =
   match array_get_opt array (memory.pc+1) with
   | None -> List.rev memory.out |> List.map string_of_int |> String.concat ","
-  | Some operand ->
-    (* Format.printf "A=%d; B=%d; C=%d; op=%d; operand=%d" memory.register_A memory.register_B memory.register_C  *)
-    part1 (step (instruction array.(memory.pc)) operand memory, array)
-(*
-module IntSet = Set.Make(Int)
+  | Some operand -> part1 (step (instruction array.(memory.pc)) operand memory, array)
 
-type bit =
-  | Unknown of int (** Unknown bit at position i in the initial value of a *)
-  | Xor of IntSet.t * bool (** set of unknowns that appear in xor, and bool if flipped *)
-  | Zero
-  | One
 
-type truth_value = False | True | Either
+(** Run program until first print, return that print *)
+let rec step_to_out memory array =
+  match memory.out with
+  | [] -> step_to_out (step (instruction array.(memory.pc)) array.(memory.pc + 1) memory) array
+  | x::[] -> x
+  | _::_ -> failwith "Multiple outs in a single instruction"
 
-module SymbolicInt = struct
+(** This only works because the program is very simple:
+    - it is a simple loop, starting at instruction 0
+    - there is a single "out" per loop iteration
+    - B and C are written before being read on each iteration
+      (we can ignore their initial value)
+    - A is right-shifted by 3-bits every iteration
+    With these constraints, we can compute the value of A 3-bits at a time.
+    We start by the last prints, find a value that matches, shift it left by 3
+    and repeat.
 
-  type t = int list
-  let size = 32
-  let unknown = List.init size (fun x -> Unknown x)
-  let of_int size n = List.init size (fun x -> if (n lsr x) land 1 = 1 then One else Zero)
-  let rec ( lsr ) a n =
-    if n = 0 then a else
-    match a with [] -> [] | _::a -> a lsr (n-1)
+    Some backtracking is needed because the printed value at each iteration
+    depends on the last six bits of A, not just the last 3. *)
+let rec find_A a memory array = function
+  | [] -> Some a
+  | x::xs ->
+      let a = a lsl 3 in
+      let rec aux = function
+        | 8 -> None
+        | n ->
+          let register_A = a lor n in
+          if step_to_out {memory with register_A } array = x
+          then
+          match find_A register_A memory array xs with
+          | None -> aux (n+1)
+          | some -> some
+          else aux (n+1)
+      in aux 0
 
-  let xor set bool =
-    if IntSet.is_empty set then if bool then One else Zero
-    else if not bool && IntSet.cardinal set = 1 then Unknown (IntSet.choose set)
-    else Xor(set, bool)
-
-  let bxor a b = if a then not b else b
-
-  let[@tail_mod_cons] rec ( lxor ) a b = match a, b with
-    | [], c | c, [] -> c
-    | a::a', b::b' ->
-        let c = match a, b with
-        | Zero, c | c, Zero -> c
-        | One, One -> Zero
-        | One, Xor(c, b) | Xor(c, b), One -> xor c (not b)
-        | One, Unknown x | Unknown x, One -> Xor(IntSet.singleton x, true)
-        | Unknown a, Unknown b -> if a = b then Zero else Xor (IntSet.singleton a |> IntSet.add b, false)
-        | Xor(a,b), Xor(c,d) -> xor (IntSet.diff (IntSet.union a c) (IntSet.inter a c)) (bxor b d)
-        | Xor(a,b), Unknown c
-        | Unknown c, Xor(a,b) -> xor (IntSet.add c a) b
-        in c :: (a' lxor b')
-
-  let force_truth = function
-    | False -> Either
-    | x -> x
-  let rec truth_value = function
-    | [] -> False
-    | One::_ -> True
-    | Zero::rest -> truth_value rest
-    | Xor(_,_)::rest
-    | Unknown _::rest ->force_truth (truth_value rest)
-
-  let rec mask n x = match n,x with
-    | 0, _ | _, [] -> []
-    | n, x::xs -> x::mask (n-1) xs
-end
-
-let combo_operand memory = function
-  | n when n < 4 -> SymbolicInt.of_int 3 n
-  | 4 -> memory.register_A
-  | 5 -> memory.register_B
-  | 6 -> memory.register_C
-  | _ -> failwith "Invalid combo operand" *)
-
-(* let step2 operation operand memory =
-  let open SymbolicInt in
-  match operation with
-  | Adv -> set_reg memory A (memory.register_A lsr (combo_operand memory operand))
-  | Bxl -> set_reg memory B (memory.register_B lxor of_int 3 operand)
-  | Bst -> set_reg memory B (mask 3 @@ combo_operand memory operand)
-  | Jnz -> if memory.register_A = 0 then {memory with pc=memory.pc+2} else {memory with pc=operand}
-  | Bxc -> set_reg memory B (memory.register_B lxor memory.register_C)
-  | Out -> { memory with out = (combo_operand memory operand land 0b111)::memory.out; pc=memory.pc+2 }
-  | Bdv -> set_reg memory B (memory.register_A lsr (combo_operand memory operand))
-  | Cdv -> set_reg memory C (memory.register_A lsr (combo_operand memory operand)) *)
-
-(*
-2,4, B = A & 0b111 (Bst 4)
-1,5, B = B xor 0b101 (Bxl 5) = A & 0b111 xor 0b101
-7,5, C = A >> B      (Cdv 5) =
-4,3, B = B xor C
-1,6, B = B xor 0b110 (Bxl 6)
-0,3, A = A >> 3      (Adv 3)
-5,5, out B
-3,0  goto 0 if A non-zero
-
-=> printed value at each loop only depends on the low 6 bits of A
-*)
-
-let condensed_function (memory,array) =
-  let table = Hashtbl.create 1000 in
-  let add_to_values
-  for i
-
-let rec tryall high_A out_target =
-  match out
 
 let part2 (memory,array) =
-  for i = 0 to Array.length array / 2 do
-
-  done
-  "0x"
+  let printed_values = Array.to_list array |> List.rev in
+  let register_A = Option.get @@ find_A 0 memory array printed_values in
+  let output = part1 ({memory with register_A}, array) in
+  Format.sprintf "A = %d; Program = %s; Output = %s"
+    register_A
+    (Array.to_list array |> List.map string_of_int |> String.concat ",")
+    output
 
 let () = register ~year:2024 ~day:17 ~preprocess ~part1 ~part2
