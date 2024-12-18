@@ -26,7 +26,28 @@ let set_fold_pairs (type elt set) (module Set: Set.S with type elt = elt and typ
     | Seq.Cons(_,s) -> Seq.fold_left (fun acc elt' -> f elt elt' acc) acc s
     ) set acc
 
+type binary_search_result =
+  | Present of int
+  | Absent of int
 
+let rec binary_search f low high =
+  if high < low then Absent low
+  else
+  let mid = low + (high - low) / 2 in (* does not overflow, unlike (high+low)/2 *)
+  let n = f mid in
+  if n = 0 then Present mid
+  else if n < 0
+  then binary_search f (mid+1) high
+  else binary_search f low (mid-1)
+
+module IntMap = Map.Make(Int)
+
+let rec imap_pop_minimum imap = match IntMap.min_binding imap with
+  | (i, []) -> imap_pop_minimum (IntMap.remove i imap)
+  | (i, [n]) -> i, n, IntMap.remove i imap
+  | (i, n::ns) -> i, n, IntMap.add i ns imap
+
+let test = ref false
 
 type solution = Wrapped: {
   preprocess: string list -> 'a;

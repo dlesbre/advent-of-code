@@ -7,7 +7,7 @@
 # Constants
 # ===================================================
 
-DAY = 17
+DAY = 18
 YEAR = 2024
 PART = 1
 
@@ -120,7 +120,7 @@ compile: $(EXE) ## Compile the given puzzle
 .PHONY: run-test
 run-test: $(EXE) ## Compile and run with test data
 	$(call print,Running $< with test data)
-	$(TIME) $(BEXE) < $(TARGET)_test.txt
+	$(TIME) $(BEXE) --test < $(TARGET)_test.txt
 
 .PHONY: run
 run: $(EXE) ## Compile and run with input data

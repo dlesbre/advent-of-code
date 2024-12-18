@@ -4,6 +4,11 @@ type t = int * int
 
 val compare: t -> t -> int
 
+val of_string: string -> t
+
+val in_box: t -> low:t -> high:t -> bool
+(** [in_box t ~low ~high] is true iff [low.x <= t.x <= high.x] and same for y *)
+
 val ( +| ) : t -> t -> t
 val ( -| ) : t -> t -> t
 val ( ~| ) : t -> t

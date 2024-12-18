@@ -16,17 +16,6 @@ let parse_tile pos = function
 
 
 (** Use a map score -> list of positions as a priority queue *)
-module IntMap = Map.Make(Int)
-
-let pop_minimum imap = match IntMap.min_binding imap with
-  | (_, []) -> failwith "empty min"
-  | (i, [n]) -> i, n, IntMap.remove i imap
-  | (i, n::ns) -> i, n, IntMap.add i ns imap
-
-let rec list_assoc_update f n = function
-  | [] -> [n, f None]
-  | (n', a)::ns when n = n' -> (n, f (Some a))::ns
-  | elt::ns -> elt::list_assoc_update f n ns
 
 let add_elt i n path imap =
   IntMap.update i (function
@@ -36,7 +25,7 @@ let add_elt i n path imap =
 
 (** Perform breadth first search using a priority queue "score -> position*direction*paths" *)
 let rec bfs grid seen queue =
-  let (score, (n, path), queue) = pop_minimum queue in
+  let (score, (n, path), queue) = imap_pop_minimum queue in
   if Hashtbl.mem seen n then bfs grid seen queue
   else
     let (pos, dir) = n in

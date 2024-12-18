@@ -6,6 +6,11 @@ let compare (x,y) (x',y') =
   let cmp = Int.compare x x' in
   if cmp = 0 then Int.compare y y' else cmp
 
+let of_string str = Scanf.sscanf str ("%d,%d") (fun a b -> (a,b))
+
+let in_box (x,y) ~low:(x',y') ~high:(x'',y'') =
+  x' <= x && x <= x'' && y' <= y && y <= y''
+
 let ( +| ) (x,y) (x',y') = x+x', y+y'
 let ( -| ) (x,y) (x',y') = x-x', y-y'
 let ( ~| ) (x,y) = (-x,-y)

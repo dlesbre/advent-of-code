@@ -105,11 +105,11 @@ let rec find_tree_smart robots size n =
 
 let test_size = (11,7)
 let true_size = (101,103)
-let size = true_size
+let size () = if !test then test_size else true_size
 let part1 robots =
-  let new_positions = List.map (calc_position 100 size) robots in
-  quadrant_sum size new_positions
+  let new_positions = List.map (calc_position 100 (size ())) robots in
+  quadrant_sum (size ()) new_positions
 
-let part2 robots = find_tree_smart robots size 0
+let part2 robots = find_tree_smart robots (size ()) 0
 
 let () = register_int ~year:2024 ~day:14 ~preprocess ~part1 ~part2
