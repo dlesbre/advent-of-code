@@ -26,6 +26,25 @@ let dot (x,y) (x',y') = x*x' + y*y'
 
 let det (x,y) (x',y') = x*y' - y*x'
 
+(* Shoelace formula:
+   2*A = sum (for i = 1 to N) x_i * (y_[i+1] - y_[i-1])
+   Note that y_[i+1] / y_[i-1] may wrap around, we solve this by re-adding
+   the last two elements at the front of the list
+*)
+let rec last_two = function
+  | [a;b] -> a,b
+  | [] | [_] -> failwith "list too short"
+  | _::rest -> last_two rest
+
+
+let double_area polygon =
+  let a, b = last_two polygon in
+  let rec aux sum = function
+    | (_,y)::((x,_)::(_,y')::_ as rest) -> aux (sum + x*(y'-y)) rest
+    | _ -> sum
+  in aux 0 (a::b::polygon)
+
+
 let inverse (x,y) (x',y') = (y',-y), (-x',x)
 
 module Set = Set.Make(struct type nonrec t = t let compare = compare end)
