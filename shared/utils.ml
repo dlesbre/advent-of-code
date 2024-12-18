@@ -26,6 +26,13 @@ let set_fold_pairs (type elt set) (module Set: Set.S with type elt = elt and typ
     | Seq.Cons(_,s) -> Seq.fold_left (fun acc elt' -> f elt elt' acc) acc s
     ) set acc
 
+module IntMap = Map.Make(Int)
+
+let rec imap_pop_minimum imap = match IntMap.min_binding imap with
+  | (i, []) -> imap_pop_minimum (IntMap.remove i imap)
+  | (i, [n]) -> i, n, IntMap.remove i imap
+  | (i, n::ns) -> i, n, IntMap.add i ns imap
+
 type binary_search_result =
   | Present of int
   | Absent of int
@@ -40,12 +47,21 @@ let rec binary_search f low high =
   then binary_search f (mid+1) high
   else binary_search f low (mid-1)
 
-module IntMap = Map.Make(Int)
+let rec gcd a = function
+  | 0 -> a
+  | b -> gcd b (a mod b)
+let gcd a b = gcd (abs a) (abs b)
 
-let rec imap_pop_minimum imap = match IntMap.min_binding imap with
-  | (i, []) -> imap_pop_minimum (IntMap.remove i imap)
-  | (i, [n]) -> i, n, IntMap.remove i imap
-  | (i, n::ns) -> i, n, IntMap.add i ns imap
+let lcm a b = if a = 0 || b = 0 then 0 else abs (a / gcd a b * b)
+
+let rec bezout_coefficients old_u u old_v v a = function
+  | 0 -> (a, old_u, old_v)
+  | b ->
+      let q = a / b in
+      bezout_coefficients u (old_u - q*u) v (old_v-q*v) b (a-q*b)
+let bezout_coefficients a b =
+  let (gcd, u, v) = bezout_coefficients 1 0 0 1 (abs a) (abs b) in
+  gcd, (if a < 0 then -u else u), (if b < 0 then -v else v)
 
 let test = ref false
 

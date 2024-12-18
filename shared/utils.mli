@@ -1,8 +1,7 @@
+(** {1 Useful functions missing from Stdlib}*)
+
 val ( % ) : int -> int -> int
 (** Euclidian modulo *)
-
-val read_all_lines : unit -> string list
-(** Read all lines from standard input *)
 
 val list_assoc_update: ('b option -> 'b) -> 'a -> ('a*'b) list -> ('a*'b) list
 (** [list_assoc_update f a l] replaces binding [(a,b)] in [l] by [(a,f (Some b))]
@@ -16,6 +15,15 @@ val set_fold_pairs:
   ('elt -> 'elt -> 'acc -> 'acc) -> 't -> 'acc -> 'acc
 (** Iterate on the distinct pairs of a set *)
 
+(** {1 Mathematical function/algorithms} *)
+
+(** Both gcd and lcm are guaranteed to be positive *)
+val gcd: int -> int -> int
+val lcm: int -> int -> int
+
+val bezout_coefficients: int -> int -> int * int * int
+(** [bezout_coefficients a b] is [(gcd a b, u, v)] with [a*u + b*v = gcd a b]. *)
+
 type binary_search_result =
   | Present of int
   | Absent of int (** smallest index larger than value *)
@@ -25,18 +33,22 @@ val binary_search: (int -> int) -> int -> int -> binary_search_result
     that satifies [f].
 
     [f] uses the convention of [compare]: negative if too low, [0] if correct,
-    positive if too high. It should be monotone
+    positive if too high. The sign of [f] must be increasing (i.e. if [n < m]
+    then [sign (f n) <= sign (f m)]).
 
-    @returns [Present n] if there an [n] with [low <= n <= high] and [f n = 0]
+    @returns [Present n] if there an [n] with [low <= n <= high] and [f n = 0].
+      If there are multiple such [n], returns an arbitrary choice.
     @returns [Absent n] if there is no [n] in [low..high] such that [f n = 0]
-      In that case, [n] is the lowest elemnt of [low..high] such that [f n > 0].
-*)
+      In that case, [n] is the lowest element of [low..high] such that [f n > 0].
+      This assumes [f high >= 0].
+      If not, may return [Absent high] with [f high < 0]. *)
 
 module IntMap : Map.S with type key = int
 
 val imap_pop_minimum: 'a list IntMap.t -> int * 'a * 'a list IntMap.t
 (** Return and remove the head element of the list with the lowest key in IntMap *)
 
+(** {1 Register and run puzzle solutions} *)
 
 val test: bool ref
 (** True when running on test input, false otherwise *)
