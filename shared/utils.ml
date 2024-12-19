@@ -33,6 +33,18 @@ let rec imap_pop_minimum imap = match IntMap.min_binding imap with
   | (i, [n]) -> i, n, IntMap.remove i imap
   | (i, n::ns) -> i, n, IntMap.add i ns imap
 
+let imap_add_elt i n imap =
+  IntMap.update i (function
+    | None -> Some [n]
+    | Some ns -> Some (n::ns))
+  imap
+
+let imap_merge_elt i n f imap =
+  IntMap.update i (function
+    | None -> Some [(n, f None)]
+    | Some ns -> Some (list_assoc_update f n ns))
+  imap
+
 type binary_search_result =
   | Present of int
   | Absent of int
@@ -62,6 +74,24 @@ let rec bezout_coefficients old_u u old_v v a = function
 let bezout_coefficients a b =
   let (gcd, u, v) = bezout_coefficients 1 0 0 1 (abs a) (abs b) in
   gcd, (if a < 0 then -u else u), (if b < 0 then -v else v)
+
+(* Shoelace formula:
+   2*A = sum (for i = 1 to N) x_i * (y_[i+1] - y_[i-1])
+   Note that y_[i+1] / y_[i-1] may wrap around, we solve this by re-adding
+   the last two elements at the front of the list
+*)
+let rec last_two = function
+  | [a;b] -> a,b
+  | [] | [_] -> failwith "list too short"
+  | _::rest -> last_two rest
+
+
+let polygon_double_area polygon =
+  let a, b = last_two polygon in
+  let rec aux sum = function
+    | (_,y)::((x,_)::(_,y')::_ as rest) -> aux (sum + x*(y'-y)) rest
+    | _ -> sum
+  in aux 0 (a::b::polygon)
 
 let test = ref false
 

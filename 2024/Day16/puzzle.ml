@@ -17,11 +17,7 @@ let parse_tile pos = function
 
 (** Use a map score -> list of positions as a priority queue *)
 
-let add_elt i n path imap =
-  IntMap.update i (function
-    | None -> Some [(n, path)]
-    | Some ns -> Some (list_assoc_update (function None -> path | Some p -> Vec2.Set.union p path) n ns))
-  imap
+let add_elt i n path imap = imap_merge_elt i n (function None -> path | Some p -> Vec2.Set.union p path) imap
 
 (** Perform breadth first search using a priority queue "score -> position*direction*paths" *)
 let rec bfs grid seen queue =

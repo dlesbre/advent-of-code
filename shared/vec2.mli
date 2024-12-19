@@ -23,12 +23,6 @@ val dist_manhattan : t -> t -> int
 
 val dot: t -> t -> int
 
-val double_area: t list -> int
-(** [double_area polygon] returns the double of the area of the polygon delimited by
-    the points of [polygon] (as it is guaranteed to be an integer).
-    [polygon] must have at least three points.
-    Uses the {{: https://en.wikipedia.org/wiki/Shoelace_formula}Shoelace formula}. *)
-
 val det: t -> t -> int
 (** Determinant of the 2-2 matrix made of both vectors *)
 

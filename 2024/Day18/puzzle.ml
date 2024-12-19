@@ -10,12 +10,6 @@ let rec set_of_binding set n list = match n, list with
   | 0, _ | _, [] -> set
   | n, x::list -> Hashtbl.add set x (); set_of_binding set (n-1) list
 
-let add_elt i n imap =
-  IntMap.update i (function
-    | None -> Some [n]
-    | Some ns -> Some (n::ns))
-  imap
-
 let rec bfs seen queue =
   let (score, pos, queue) = imap_pop_minimum queue in
   if not(Vec2.in_box pos ~low:(0,0) ~high:(size ())) then bfs seen queue else
@@ -27,10 +21,10 @@ let rec bfs seen queue =
       Hashtbl.replace seen pos ();
       let score = score + 1 in
       queue |>
-        add_elt score (pos +| (1,0)) |>
-        add_elt score (pos +| (-1,0)) |>
-        add_elt score (pos +| (0,1)) |>
-        add_elt score (pos +| (0,-1)) |>
+        imap_add_elt score (pos +| (1,0)) |>
+        imap_add_elt score (pos +| (-1,0)) |>
+        imap_add_elt score (pos +| (0,1)) |>
+        imap_add_elt score (pos +| (0,-1)) |>
       bfs seen
     end
 

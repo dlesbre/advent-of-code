@@ -15,6 +15,21 @@ val set_fold_pairs:
   ('elt -> 'elt -> 'acc -> 'acc) -> 't -> 'acc -> 'acc
 (** Iterate on the distinct pairs of a set *)
 
+(** {1 Integer map as priority queue} *)
+
+module IntMap : Map.S with type key = int
+
+val imap_pop_minimum: 'a list IntMap.t -> int * 'a * 'a list IntMap.t
+(** Return and remove the head element of the list with the lowest key in IntMap *)
+
+val imap_add_elt: int -> 'a -> 'a list IntMap.t -> 'a list IntMap.t
+(** Add an element with given priority (at the head of a list) *)
+
+val imap_merge_elt: int -> 'a -> ('b option -> 'b) -> ('a*'b) list IntMap.t -> ('a*'b) list IntMap.t
+(** [imap_merge_elt p k f imap] adds an element with priority [p] in [imap]:
+    - If there is already an element [(k,b)] with priority [p], replace it with [(k, f (Some b))]
+    - Else, add [(k, f None)] at the end of the list *)
+
 (** {1 Mathematical function/algorithms} *)
 
 (** Both gcd and lcm are guaranteed to be positive *)
@@ -43,10 +58,13 @@ val binary_search: (int -> int) -> int -> int -> binary_search_result
       This assumes [f high >= 0].
       If not, may return [Absent high] with [f high < 0]. *)
 
-module IntMap : Map.S with type key = int
+val polygon_double_area: (int * int) list -> int
+(** [polygon_double_area polygon] returns the double of the area of the polygon delimited by
+    the points of [polygon] (as it is guaranteed to be an integer).
+    [polygon] must have at least three points.
+    Uses the {{: https://en.wikipedia.org/wiki/Shoelace_formula}Shoelace formula}. *)
 
-val imap_pop_minimum: 'a list IntMap.t -> int * 'a * 'a list IntMap.t
-(** Return and remove the head element of the list with the lowest key in IntMap *)
+
 
 (** {1 Register and run puzzle solutions} *)
 
