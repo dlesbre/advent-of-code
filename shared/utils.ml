@@ -19,6 +19,16 @@ let array_get_opt array x =
   then Some (Array.unsafe_get array x)
   else None
 
+let rec list_sum f total = function
+  | [] -> total
+  | x::xs -> list_sum f (total + f x) xs
+let list_sum f l = list_sum f 0 l
+
+let rec list_count f total = function
+  | [] -> total
+  | x::xs -> list_count f (total + if f x then 1 else 0) xs
+let list_count f l = list_count f 0 l
+
 let set_fold_pairs (type elt set) (module Set: Set.S with type elt = elt and type t = set) f (set: set) acc =
   Set.fold (fun elt acc ->
     match Set.to_seq_from elt set () with

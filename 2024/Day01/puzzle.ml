@@ -28,9 +28,9 @@ let compute_occurences list =
 
 let part2 (la, lb) =
   let occurences = compute_occurences lb in
-  List.fold_left (fun acc elt -> acc + elt * match Hashtbl.find occurences elt with
+  list_sum (fun elt -> elt * match Hashtbl.find occurences elt with
     | n -> n
     | exception Not_found -> 0
-  ) 0 la
+  ) la
 
 let () = register_int ~year:2024 ~day:01 ~preprocess ~part1 ~part2

@@ -41,11 +41,11 @@ let cst = 10000000000000
 let part1 input =
   let l = List.filter_map solve_machine input in
   let l = List.filter (fun (x, y) -> x <= 100 && y <= 100) l in
-  List.fold_left (fun total nb -> total + count_token nb) 0 l
+  list_sum count_token l
 
 let part2 input =
   let input_corrected = List.map (fun x -> { x with prize = Vec2.(x.prize +| (cst, cst))}) input in
   let l = List.filter_map solve_machine input_corrected in
-  List.fold_left (fun total nb -> total + count_token nb) 0 l
+  list_sum count_token l
 
   let () = register_int ~year:2024 ~day:13 ~preprocess ~part1 ~part2

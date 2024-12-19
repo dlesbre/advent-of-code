@@ -36,7 +36,7 @@ let pp fmt l = Format.fprintf fmt "[%a]" (Format.pp_print_list ~pp_sep:(fun fmt 
 (** Merge list from children into parent list (by pointwise sums) *)
 let[@tail_mod_cons] rec merge_lists n next =
   if n < 0 then [] else
-    List.fold_left (fun acc x -> acc + List.hd x) 0 next ::
+    list_sum List.hd next::
     merge_lists (n-1) (List.map List.tl next)
 
 (** Compute a list of length n, where the ith element is the number of stones
@@ -54,8 +54,7 @@ let rec compute_list n stone =
       result
 
 let total n input =
-  List.map (fun stone -> List.nth (compute_list n stone) n) input |>
-  List.fold_left (+) 0
+  list_sum (fun stone -> List.nth (compute_list n stone) n) input
 
 let part1 = total 25
 let part2 = total 75

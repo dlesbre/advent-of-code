@@ -10,7 +10,7 @@ let color = function
   | 'g' -> Green
   | _ -> failwith "invalid color"
 
-let color_id = function
+let color_id = function (* This is most likely compiled to no-op *)
   | White -> 0
   | Blue -> 1
   | Black -> 2
@@ -20,13 +20,11 @@ let color_id = function
 type color_trie = {
   children: color_trie option array;
   stop: bool;
-  id: int; (* unique id for hashing *)
 }
-let counter = ref 0
-let empty_trie () = incr counter; {
+
+let empty_trie () = {
   children = Array.make 5 None;
   stop = false;
-  id = !counter;
 }
 
 let rec add_to_trie color_trie = function
@@ -40,70 +38,55 @@ let rec add_to_trie color_trie = function
       color_trie
 let parse_pattern pattern = String.fold_right (fun c l -> color c::l) pattern []
 
-let string_strip x =
-  if String.starts_with ~prefix:" " x then
-    String.sub x 1 (String.length x-1)
-  else x
-
 let preprocess = function
   | towels::""::patterns ->
           String.split_on_char ',' towels
-          |> List.map string_strip
+          |> List.map String.trim
           |> List.map parse_pattern
           |> List.fold_left add_to_trie (empty_trie ()),
           List.map parse_pattern patterns
   | _ -> failwith "Invalid format"
 
-module H = Hashtbl.Make(struct
-  type t = color_trie * color list
-  let hash (x,y) = Hashtbl.hash (x.id,y)
-  let equal (x,y) (x',y') = x.id = x'.id && y = y'
-end)
-
-let can_create table color_trie pattern =
-  let rec aux trie pat b =
-    match H.find_opt table (trie, pat) with
-    | Some b -> b
-    | None ->
+let rec can_create table color_trie pattern =
+  match Hashtbl.find_opt table pattern with
+  | Some b -> b
+  | None ->
+  let rec aux trie pat =
     match pat with
     | [] -> trie.stop
-    | c::cs ->
-        let result =
-        match trie.children.(color_id c) with
-        | None -> trie.stop && b && aux color_trie pat false
-        | Some child ->
-          aux child cs true || (trie.stop && b && aux color_trie pat false)
-        in
-        H.add table (trie, pat) result;
-        result
-    in aux color_trie pattern false
+    | c::cs -> match trie.children.(color_id c) with
+              | None -> trie.stop && can_create table color_trie pat
+              | Some child ->
+                aux child cs || (trie.stop && can_create table color_trie pat)
+  in let result = aux color_trie pattern in
+  Hashtbl.add table pattern result;
+  result
 
 
 let part1 (color_trie, patterns) =
-  let table = H.create 4096 in
-  List.fold_left (fun total pat -> if can_create table color_trie pat then total+1 else total) 0 patterns
+  let table = Hashtbl.create 4096 in
+  list_count (can_create table color_trie) patterns
 
 
-let count_arrangements table color_trie pattern =
-  let rec aux trie pat b =
-    match H.find_opt table (trie, pat) with
-    | Some b -> b
-    | None ->
+let rec count_arrangements table color_trie pattern =
+  match Hashtbl.find_opt table pattern with
+  | Some b -> b
+  | None ->
+  let rec aux trie pat =
     match pat with
     | [] -> if trie.stop then 1 else 0
     | c::cs ->
-        let result =
         match trie.children.(color_id c) with
-        | None -> if trie.stop && b then aux color_trie pat false else 0
-        | Some child ->
-          aux child cs true + (if trie.stop && b then aux color_trie pat false else 0)
-        in
-        H.add table (trie, pat) result;
-        result
-    in aux color_trie pattern false
+        | None -> if trie.stop then count_arrangements table color_trie pat else 0
+        | Some child -> aux child cs +
+                 (if trie.stop then count_arrangements table color_trie pat else 0)
+    in
+  let result = aux color_trie pattern in
+  Hashtbl.add table pattern result;
+  result
 
 let part2 (color_trie, patterns) =
-  let table = H.create 4096 in
-  List.fold_left (fun total pat -> total + count_arrangements table color_trie pat) 0 patterns
+  let table = Hashtbl.create 4096 in
+  list_sum (count_arrangements table color_trie) patterns
 
 let () = register_int ~year:2024 ~day:19 ~preprocess ~part1 ~part2

@@ -10,6 +10,12 @@ val list_assoc_update: ('b option -> 'b) -> 'a -> ('a*'b) list -> ('a*'b) list
 val array_get_opt: 'a array -> int -> 'a option
 (** None if out of bounds *)
 
+val list_count: ('a -> bool) -> 'a list -> int
+(** [list_count f l] is the number of elements of [l] that satisfy [f] *)
+
+val list_sum: ('a -> int) -> 'a list -> int
+(** [list_sum f [a0;...;an]] is [f a0 + ... + f an]. *)
+
 val set_fold_pairs:
   (module Set.S with type elt = 'elt and type t = 't) ->
   ('elt -> 'elt -> 'acc -> 'acc) -> 't -> 'acc -> 'acc
