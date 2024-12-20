@@ -19,6 +19,8 @@ let array_get_opt array x =
   then Some (Array.unsafe_get array x)
   else None
 
+let ( |>> ) f g x = g (f x)
+
 let rec list_sum f total = function
   | [] -> total
   | x::xs -> list_sum f (total + f x) xs

@@ -65,6 +65,9 @@ let foldi (f : int * int -> 'a -> 'acc -> 'acc) (init: 'acc) (a : 'a array array
   (init, 0) a
   |> fst
 
+let sum f grid = foldi (fun pos elt acc -> f pos elt + acc) 0 grid
+let count f grid = foldi (fun pos elt acc -> if f pos elt then acc + 1 else acc) 0 grid
+
 let pp pp_a fmt grid =
   Array.iter (fun line ->
     Array.iter (pp_a fmt) line;

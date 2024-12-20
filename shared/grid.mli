@@ -26,6 +26,8 @@ val read: (Vec2.t -> char -> 'a) -> 'a t
 
 val iteri: (Vec2.t -> 'a -> unit) -> 'a t -> unit
 val foldi: (Vec2.t -> 'a -> 'acc -> 'acc) -> 'acc -> 'a t -> 'acc
+val sum: (Vec2.t -> 'a -> int) -> 'a t -> int
+val count: (Vec2.t -> 'a -> bool) -> 'a t -> int
 val pp: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
 val ppi: (Vec2.t -> Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
 
