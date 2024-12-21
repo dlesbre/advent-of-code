@@ -4,6 +4,7 @@ exception Out_of_bounds
 
 val make: Vec2.t -> 'a -> 'a t
 val init: Vec2.t -> (Vec2.t -> 'a) -> 'a t
+val of_array: 'a array array -> 'a t
 
 val get: 'a t -> Vec2.t -> 'a
 (** @raises Out_of_bounds when invalid *)
@@ -35,6 +36,8 @@ type direction = N | E | S | W
 module DirectionSet: Bitset.S with type elt = direction
 val direction_pp : Format.formatter -> direction -> unit
 val vec2_of_direction : direction -> Vec2.t
+val direction_parse: char -> direction
+(** Parse '^', '<', '>', 'v' or 'N', 'E', 'S', 'W' in a direction *)
 
 val rotate_clockwise: direction -> direction
 (** N -> E *)

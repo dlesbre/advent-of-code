@@ -16,6 +16,8 @@ val list_count: ('a -> bool) -> 'a list -> int
 val list_sum: ('a -> int) -> 'a list -> int
 (** [list_sum f [a0;...;an]] is [f a0 + ... + f an]. *)
 
+val list_min: ('a -> int) -> 'a list -> int
+
 val ( |>> ) : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c
 
 val set_fold_pairs:

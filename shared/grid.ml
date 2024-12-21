@@ -4,6 +4,7 @@ exception Out_of_bounds
 
 let make (x,y) a = Array.init y (fun _ -> Array.make x a)
 let init (x,y) f = Array.init y (fun y -> Array.init x (fun x -> f (x,y)))
+let of_array x = x
 
 let lines = Array.length
 let columns x = Array.length (x.(0))
@@ -107,6 +108,12 @@ let rotate_counterclockwise = function
   | E -> N
   | S -> E
   | W -> S
+let direction_parse = function
+  | '^' | 'N' -> N
+  | '<' | 'W' -> W
+  | '>' | 'E' -> E
+  | 'v' | 'S' -> S
+  | _ -> failwith "Invalid direction"
 
 let all_directions = [N;E;S;W]
 let direction_fold f acc = List.fold_left (fun acc d -> f d acc) acc all_directions

@@ -31,6 +31,8 @@ let rec list_count f total = function
   | x::xs -> list_count f (total + if f x then 1 else 0) xs
 let list_count f l = list_count f 0 l
 
+let list_min f l = List.fold_left (fun m x -> min m (f x)) Int.max_int l
+
 let set_fold_pairs (type elt set) (module Set: Set.S with type elt = elt and type t = set) f (set: set) acc =
   Set.fold (fun elt acc ->
     match Set.to_seq_from elt set () with
