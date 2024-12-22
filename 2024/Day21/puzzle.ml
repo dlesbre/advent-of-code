@@ -17,8 +17,7 @@ let door_keypad = function
   | 'A' -> (2,3)
   | _ -> failwith "Invalid door code"
 
-let robot_keypad =
-  let open Grid in function
+let robot_keypad = function
   | 'E' -> (0,0)
   | '^' -> (1,0)
   | 'A' -> (2,0)

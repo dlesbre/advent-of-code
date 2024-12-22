@@ -25,6 +25,8 @@ val set_fold_pairs:
   ('elt -> 'elt -> 'acc -> 'acc) -> 't -> 'acc -> 'acc
 (** Iterate on the distinct pairs of a set *)
 
+val hashtbl_incr: ('a, int) Hashtbl.t -> 'a -> int -> unit
+
 (** {1 Integer map as priority queue} *)
 
 module IntMap : Map.S with type key = int
