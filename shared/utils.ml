@@ -40,11 +40,18 @@ let set_fold_pairs (type elt set) (module Set: Set.S with type elt = elt and typ
     | Seq.Cons(_,s) -> Seq.fold_left (fun acc elt' -> f elt elt' acc) acc s
     ) set acc
 
+let set_sum (type elt set) (module Set: Set.S with type elt = elt and type t = set) f set =
+  Set.fold (fun x acc -> acc + f x) set 0
+
+let set_count (type elt set) (module Set: Set.S with type elt = elt and type t = set) f set =
+  Set.fold (fun x acc -> if f x then acc + 1 else acc) set 0
+
 let hashtbl_incr table key n =
   match Hashtbl.find table key with
   | x -> Hashtbl.replace table key (x+n)
   | exception Not_found -> Hashtbl.add table key n
 
+module IntSet = Set.Make(Int)
 module IntMap = Map.Make(Int)
 
 let rec imap_pop_minimum imap = match IntMap.min_binding imap with

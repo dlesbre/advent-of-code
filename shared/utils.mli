@@ -25,11 +25,22 @@ val set_fold_pairs:
   ('elt -> 'elt -> 'acc -> 'acc) -> 't -> 'acc -> 'acc
 (** Iterate on the distinct pairs of a set *)
 
+val set_sum:
+  (module Set.S with type elt = 'elt and type t = 't) ->
+  ('elt -> int) -> 't -> int
+(** [set_sum (module Set) f t] sums the values of [f] applied to all elements of [t]. *)
+
+val set_count:
+  (module Set.S with type elt = 'elt and type t = 't) ->
+  ('elt -> bool) -> 't -> int
+(** [set_count (module Set) f t] counts the elements of [t] that satisfy [f]. *)
+
 val hashtbl_incr: ('a, int) Hashtbl.t -> 'a -> int -> unit
 
 (** {1 Integer map as priority queue} *)
 
 module IntMap : Map.S with type key = int
+module IntSet : Set.S with type elt = int
 
 val imap_pop_minimum: 'a list IntMap.t -> int * 'a * 'a list IntMap.t
 (** Return and remove the head element of the list with the lowest key in IntMap *)
