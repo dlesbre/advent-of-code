@@ -51,6 +51,11 @@ let hashtbl_incr table key n =
   | x -> Hashtbl.replace table key (x+n)
   | exception Not_found -> Hashtbl.add table key n
 
+let hashtbl_cons table key n =
+  match Hashtbl.find table key with
+  | x -> Hashtbl.replace table key (n :: x)
+  | exception Not_found -> Hashtbl.add table key [n]
+
 module IntSet = Set.Make(Int)
 module IntMap = Map.Make(Int)
 

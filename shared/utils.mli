@@ -36,6 +36,11 @@ val set_count:
 (** [set_count (module Set) f t] counts the elements of [t] that satisfy [f]. *)
 
 val hashtbl_incr: ('a, int) Hashtbl.t -> 'a -> int -> unit
+(** [hashtbl_incr table key n] does [table[key] += n], defaults [table[key]] to 0 if needed *)
+
+val hashtbl_cons: ('a, 'b list) Hashtbl.t -> 'a -> 'b -> unit
+(** [hashtbl_cons table key n] does [table[key] = n :: table[key]], initializing
+    defaults [table[key]] to empty list if absent. *)
 
 (** {1 Integer map as priority queue} *)
 
