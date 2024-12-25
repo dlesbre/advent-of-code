@@ -1,7 +1,11 @@
-(** {1 Useful functions missing from Stdlib}*)
+(** {1 Useful functions missing from Stdlib}                                  *)
+(******************************************************************************)
 
 val ( % ) : int -> int -> int
 (** Euclidian modulo *)
+
+val string_suffix: string -> int -> string
+(** [string_suffix str n] is the substring of [str] excluding its [n] first characters. *)
 
 val list_assoc_update: ('b option -> 'b) -> 'a -> ('a*'b) list -> ('a*'b) list
 (** [list_assoc_update f a l] replaces binding [(a,b)] in [l] by [(a,f (Some b))]
@@ -48,13 +52,14 @@ val set_count:
 (** [set_count (module Set) f t] counts the elements of [t] that satisfy [f]. *)
 
 val hashtbl_incr: ('a, int) Hashtbl.t -> 'a -> int -> unit
-(** [hashtbl_incr table key n] does [table[key] += n], defaults [table[key]] to 0 if needed *)
+(** [hashtbl_incr table key n] does [table[key] += n], creating [table[key]] if needed *)
 
 val hashtbl_cons: ('a, 'b list) Hashtbl.t -> 'a -> 'b -> unit
-(** [hashtbl_cons table key n] does [table[key] = n :: table[key]], initializing
-    defaults [table[key]] to empty list if absent. *)
+(** [hashtbl_cons table key n] does [table[key] = n :: table[key]], creating [table[key]] if absent. *)
 
-(** {1 Integer map as priority queue} *)
+
+(** {1 Integer map as priority queue}                                         *)
+(******************************************************************************)
 
 module IntMap : Map.S with type key = int
 module IntSet : Set.S with type elt = int
@@ -70,7 +75,9 @@ val imap_merge_elt: int -> 'a -> ('b option -> 'b) -> ('a*'b) list IntMap.t -> (
     - If there is already an element [(k,b)] with priority [p], replace it with [(k, f (Some b))]
     - Else, add [(k, f None)] at the end of the list *)
 
-(** {1 Mathematical function/algorithms} *)
+
+(** {1 Mathematical function/algorithms}                                      *)
+(******************************************************************************)
 
 (** Both gcd and lcm are guaranteed to be positive *)
 val gcd: int -> int -> int
@@ -105,8 +112,8 @@ val polygon_double_area: (int * int) list -> int
     Uses the {{: https://en.wikipedia.org/wiki/Shoelace_formula}Shoelace formula}. *)
 
 
-
-(** {1 Register and run puzzle solutions} *)
+(** {1 Register and run puzzle solutions}                                     *)
+(******************************************************************************)
 
 val test: bool ref
 (** True when running on test input, false otherwise *)

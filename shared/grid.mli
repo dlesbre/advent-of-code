@@ -1,3 +1,7 @@
+(** Useful function for manipulating grids (2D arrays), as they are recurrent
+    in advent of code.
+    A grid's coordinates are given as a pair (row,column). *)
+
 type 'a t
 
 exception Out_of_bounds
@@ -15,6 +19,7 @@ val set: 'a t -> Vec2.t -> 'a -> unit
 val get_opt: 'a t -> Vec2.t -> 'a option
 val copy: 'a t -> 'a t
 val in_bounds: 'a t -> Vec2.t -> bool
+(** [in_bounds grid pos] is true when pos is a valid position in the grid. *)
 
 val lines: 'a t -> int
 val columns: 'a t -> int
@@ -39,11 +44,9 @@ val vec2_of_direction : direction -> Vec2.t
 val direction_parse: char -> direction
 (** Parse '^', '<', '>', 'v' or 'N', 'E', 'S', 'W' in a direction *)
 
-val rotate_clockwise: direction -> direction
-(** N -> E *)
+val rotate_clockwise: direction -> direction (** N -> E *)
 
-val rotate_counterclockwise: direction -> direction
-(** N -> W *)
+val rotate_counterclockwise: direction -> direction (** N -> W *)
 
 val direction_fold: (direction -> 'acc -> 'acc) -> 'acc -> 'acc
 

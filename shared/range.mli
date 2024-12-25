@@ -1,3 +1,7 @@
+(** Integer ranges (0..n or lo..high), for quick iteration.
+    Inspired by python's [range] used in for loop, but with a more functional
+    approach. *)
+
 type t = {
   start: int; (** included *)
   stop: int;  (** excluded *)

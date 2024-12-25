@@ -2,6 +2,8 @@ let ( % ) x y =
   let a = x mod y in
   if a < 0 then a + y else a
 
+let string_suffix str start = String.sub str start (String.length str - start)
+
 let rec read_all_lines acc =
   try read_all_lines (read_line ()::acc)
   with End_of_file -> List.rev acc

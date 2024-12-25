@@ -30,5 +30,7 @@ module MakeGeneric(Elt: sig type t end) = Make(struct
   let singleton x =
     let repr = Obj.repr x in
     assert (Obj.tag repr = Obj.int_tag);
-    1 lsl (Obj.magic x)
+    let x: int = Obj.magic x in
+    assert (0 <= x && x <= 63);
+    1 lsl x
 end)
