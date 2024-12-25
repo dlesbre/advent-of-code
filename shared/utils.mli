@@ -18,6 +18,18 @@ val list_sum: ('a -> int) -> 'a list -> int
 
 val list_min: ('a -> int) -> 'a list -> int
 
+val list_find_first: ('a -> bool) -> 'a list -> ('a * int) option
+(** [list_find_first f l] returns the first element of [l] that satifies [f],
+    along with its position. *)
+
+val list_split: ('a -> bool) -> 'a list -> 'a list list
+(** [list_split f l] splits [l] along elements that satifsy [l] (removing those
+    elements from the list).
+
+    For example: [list_split (fun x -> x = 0) [1;2;3;0;0;5;7;0;1;3;0]]
+    is [[ [1;2;3]; []; [5;7]; [1;3]; []]] *)
+
+
 val ( |>> ) : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c
 
 val set_fold_pairs:

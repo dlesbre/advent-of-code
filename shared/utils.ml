@@ -33,6 +33,18 @@ let list_count f l = list_count f 0 l
 
 let list_min f l = List.fold_left (fun m x -> min m (f x)) Int.max_int l
 
+let rec list_find_first pos f = function
+  | [] -> None
+  | x::_ when f x -> Some (x, pos)
+  | _::xs -> list_find_first (pos + 1) f xs
+let list_find_first f l = list_find_first 0 f l
+
+let rec list_split f local_acc global_acc = function
+  | [] -> List.rev ((List.rev local_acc)::global_acc)
+  | x::xs when f x -> list_split f [] (List.rev local_acc::global_acc) xs
+  | x::xs -> list_split f (x::local_acc) global_acc xs
+let list_split f l = list_split f [] [] l
+
 let set_fold_pairs (type elt set) (module Set: Set.S with type elt = elt and type t = set) f (set: set) acc =
   Set.fold (fun elt acc ->
     match Set.to_seq_from elt set () with
