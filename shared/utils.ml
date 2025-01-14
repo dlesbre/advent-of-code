@@ -90,6 +90,31 @@ let imap_merge_elt i n f imap =
     | Some ns -> Some (list_assoc_update f n ns))
   imap
 
+module IntifyOrder(T: Map.OrderedType) = struct
+  module M = Map.Make(T)
+  let memo = ref M.empty
+  let count = ref (-1)
+
+  let get_id x = match M.find x !memo with
+    | n -> n
+    | exception Not_found ->
+        incr count;
+        memo := M.add x !count !memo;
+        !count
+end
+
+module IntifyHash(T: Hashtbl.HashedType) = struct
+  module H = Hashtbl.Make(T)
+  let table = H.create 10
+  let count = ref (-1)
+  let get_id x = match H.find table x with
+  | n -> n
+  | exception Not_found ->
+      incr count;
+      H.add table x !count;
+      !count
+end
+
 type binary_search_result =
   | Present of int
   | Absent of int

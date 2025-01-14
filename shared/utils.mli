@@ -75,6 +75,12 @@ val imap_merge_elt: int -> 'a -> ('b option -> 'b) -> ('a*'b) list IntMap.t -> (
     - If there is already an element [(k,b)] with priority [p], replace it with [(k, f (Some b))]
     - Else, add [(k, f None)] at the end of the list *)
 
+(** {1 Intify types}                                                         *)
+(******************************************************************************)
+(** I.E. inject values from a given type to integers by counting them *)
+
+module IntifyOrder(T: Map.OrderedType) : sig val get_id: T.t -> int end
+module IntifyHash(T: Hashtbl.HashedType) : sig val get_id: T.t -> int end
 
 (** {1 Mathematical function/algorithms}                                      *)
 (******************************************************************************)
