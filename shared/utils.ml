@@ -3,6 +3,9 @@ let ( % ) x y =
   let a = x mod y in
   if a < 0 then a + y else a
 
+let fail fmtstr = Format.ksprintf failwith fmtstr
+
+
 let euclid_div x y =
   let y' = abs y in
   let a = x mod y' in
@@ -59,6 +62,21 @@ let rec list_split f local_acc global_acc = function
   | x::xs when f x -> list_split f [] (List.rev local_acc::global_acc) xs
   | x::xs -> list_split f (x::local_acc) global_acc xs
 let list_split f l = list_split f [] [] l
+
+let string_foldi f str acc =
+  String.fold_left (fun (i, acc) c -> (i+1,f i c acc)) (0, acc) str |> snd
+
+let string_slice ?(start=0) ?stop string =
+  let len = String.length string in
+  let stop = Option.value stop ~default:len in
+  let start' = if start < 0 then len + start else start in
+  let stop' = if stop < 0 then len + stop else stop in
+  if start' < 0 || stop' < start' || len < stop'
+  then fail "invalid string_slice: [%d:%d] from string of length %d" start stop len
+  else String.sub string start' (stop'-start')
+
+let parse_char c = let n = int_of_char c - int_of_char '0' in
+  if n < 0 || n > 9 then fail "invalid parse_char: %c" c else n
 
 let set_fold_pairs (type elt set) (module Set: Set.S with type elt = elt and type t = set) f (set: set) acc =
   Set.fold (fun elt acc ->

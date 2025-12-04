@@ -13,6 +13,17 @@ val euclid_div : int -> int -> int
 val string_suffix: string -> int -> string
 (** [string_suffix str n] is the substring of [str] excluding its [n] first characters. *)
 
+val string_slice: ?start:int -> ?stop:int -> string -> string
+(** Return the portion of string between [start] (included) and [stop] (excluded)
+    If unspecified, [start] is [0] and [stop] is [String.length str].
+    Both may be negative, with [-1] meaning [String.length str - 1] *)
+
+val parse_char : char -> int
+(** transfrom a character [0-9] to int *)
+
+val string_foldi: (int -> char -> 'a -> 'a) -> string -> 'a -> 'a
+(** [String.fold_left] with index *)
+
 val list_assoc_update: ('b option -> 'b) -> 'a -> ('a*'b) list -> ('a*'b) list
 (** [list_assoc_update f a l] replaces binding [(a,b)] in [l] by [(a,f (Some b))]
     If no such binding exists, adds [(a,f None)] at the end of the list. *)
