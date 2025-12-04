@@ -5,5 +5,5 @@
 (executable
  (name advent_of_code)
  (public_name advent_of_code)
- (libraries AOC AOC2024)
+ (libraries AOC AOC2024 AOC2025)
  (modules advent_of_code))

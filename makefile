@@ -7,14 +7,16 @@
 # Constants
 # ===================================================
 
-DAY = 25
-YEAR = 2024
+DAY = 01
+YEAR = 2025
 PART = 1
 
 OCAMLC = ocamlopt -I +str str.cmxa -I +unix unix.cmxa -O2
 RUSTC = rustc --cfg 'part="$(PART)"'
 CARGO = cargo
 ifeq ($(YEAR),2024)
+	DIR = $(YEAR)/Day$(DAY)
+else ifeq ($(YEAR),2025)
 	DIR = $(YEAR)/Day$(DAY)
 else
 	DIR = $(YEAR)/$(DAY)

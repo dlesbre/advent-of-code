@@ -1,6 +1,13 @@
 let ( % ) x y =
+  let y = abs y in
   let a = x mod y in
   if a < 0 then a + y else a
+
+let euclid_div x y =
+  let y' = abs y in
+  let a = x mod y' in
+  let res = if a < 0 then (x / y') - 1 else x / y' in
+  if y > 0 then res else -res
 
 let string_suffix str start = String.sub str start (String.length str - start)
 

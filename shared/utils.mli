@@ -2,7 +2,10 @@
 (******************************************************************************)
 
 val ( % ) : int -> int -> int
-(** Euclidian modulo *)
+(** Euclidian modulo: guarantees [0 <= a % b < abs b] *)
+
+val euclid_div : int -> int -> int
+(** Euclidian division: verifies that [(a / b)*b + (a % b) = a] *)
 
 val string_suffix: string -> int -> string
 (** [string_suffix str n] is the substring of [str] excluding its [n] first characters. *)
@@ -97,7 +100,7 @@ type binary_search_result =
   | Absent of int (** smallest index larger than value *)
 
 val binary_search: (int -> int) -> int -> int -> binary_search_result
-(** [binary_search f low high] tries to find a value in [lo..high] (both inclusive)
+(** [binary_search f low high] tries to find a value in [low..high] (both inclusive)
     that satifies [f].
 
     [f] uses the convention of [compare]: negative if too low, [0] if correct,
