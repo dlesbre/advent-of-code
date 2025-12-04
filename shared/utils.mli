@@ -4,6 +4,9 @@
 val ( % ) : int -> int -> int
 (** Euclidian modulo: guarantees [0 <= a % b < abs b] *)
 
+val pow : int -> int -> int
+(** integer exponential *)
+
 val euclid_div : int -> int -> int
 (** Euclidian division: verifies that [(a / b)*b + (a % b) = a] *)
 

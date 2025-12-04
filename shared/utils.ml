@@ -9,6 +9,12 @@ let euclid_div x y =
   let res = if a < 0 then (x / y') - 1 else x / y' in
   if y > 0 then res else -res
 
+let rec pow res a = function
+  | 0 -> res
+  | n -> pow (res*(if n land 1 = 0 then 1 else a)) (a * a) (n / 2)
+let pow = pow 1
+
+
 let string_suffix str start = String.sub str start (String.length str - start)
 
 let rec read_all_lines acc =
