@@ -58,7 +58,14 @@ val fold_adjacent_opt: (direction -> Vec2.t -> 'a option -> 'acc -> 'acc) -> 'ac
 
 type direction8 = NN | NE | EE | SE | SS | SW | WW | NW
 module Direction8Set: Bitset.S with type elt = direction8
+
 val direction8_of_4: direction -> direction8
 val direction8_fold: (direction8 -> 'acc -> 'acc) -> 'acc -> 'acc
 val direction8_pp: Format.formatter -> direction8 -> unit
 val vec2_of_direction8: direction8 -> Vec2.t
+
+val fold_adjacent8: (direction8 -> Vec2.t -> 'a -> 'acc -> 'acc) -> 'acc -> Vec2.t -> 'a t -> 'acc
+(** Folds the given function on the eight adjacent points (if they exist) *)
+
+val fold_adjacent8_opt: (direction8 -> Vec2.t -> 'a option -> 'acc -> 'acc) -> 'acc -> Vec2.t -> 'a t -> 'acc
+(** Same as [fold_adjacent8], but also called on positions outside of the grid (with value [None]) *)

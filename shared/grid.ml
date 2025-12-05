@@ -172,3 +172,16 @@ let direction8_pp fmt = function
   | NW -> Format.fprintf fmt "NW"
   | SE -> Format.fprintf fmt "SE"
   | SW -> Format.fprintf fmt "SW"
+
+let fold_adjacent8_opt f acc pos grid =
+  let open Vec2 in
+  List.fold_left (fun acc elt ->
+    let npos = pos +| vec2_of_direction8 elt in
+    f elt npos (get_opt grid npos) acc
+    ) acc all_directions
+
+let fold_adjacent8 f acc pos grid =
+  fold_adjacent8_opt
+    (fun dir pos v acc -> match v with
+        | None -> acc
+        | Some x -> f dir pos x acc) acc pos grid
