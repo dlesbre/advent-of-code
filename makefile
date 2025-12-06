@@ -7,7 +7,7 @@
 # Constants
 # ===================================================
 
-DAY = 05
+DAY = 06
 YEAR = 2025
 PART = 1
 
@@ -158,3 +158,4 @@ init: ## Create files for the new day
 	echo "let () = register_int ~year:$(YEAR) ~day:$(DAY) ~preprocess ~part1 ~part2" >> $(TARGET).$(EXT)
 	touch $(TARGET)_data.txt
 	touch $(TARGET)_test.txt
+	dune build
