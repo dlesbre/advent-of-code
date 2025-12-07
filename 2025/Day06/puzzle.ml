@@ -5,7 +5,7 @@ type 'a operation = {
   is_addition: bool;
 }
 
-let rec find_breaks grid =
+let find_breaks grid =
   let lines = Range.upto (Grid.lines grid) in
   let columns = (Grid.columns grid) in
   let breaks = Range.fold (fun col breaks ->
