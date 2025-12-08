@@ -55,7 +55,6 @@ val list_fold_pairs: reflexive:bool -> ('res -> 'elt -> 'elt -> 'res) -> 'res ->
     If [reflexive] is true, this includes calls [f res x x] for each element [x],
     otherwise it only includes [f res x y] where [y] appears AFTER [x] in the list. *)
 
-
 val ( |>> ) : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c
 
 val set_fold_pairs:
@@ -139,6 +138,21 @@ val polygon_double_area: (int * int) list -> int
     [polygon] must have at least three points.
     Uses the {{: https://en.wikipedia.org/wiki/Shoelace_formula}Shoelace formula}. *)
 
+
+(** Type for accumulating [n] maximal elements. See {!val-max_n}. *)
+type 'a max_n = {
+  size: int; (** Number of elements found, smaller or equal to [n]*)
+  elts: 'a list; (** List of length [size], in increasing order (max is the last element) *)
+}
+val max_n_init: 'a max_n
+
+val max_n: int -> ('a -> 'a -> int) -> 'a max_n -> 'a -> 'a max_n
+(** [max_n n compare elt prev_max] updates [prev_max] to find the also consider [n].
+    This is meant to be used in a fold to find the n maximal elements of a list/array/... :
+    [List.fold_left (max_n n compare) max_n_init my_list]
+
+    [compare] is used to compare elements, can be used for [n] minimum by flipping
+    the sign *)
 
 (** {1 Register and run puzzle solutions}                                     *)
 (******************************************************************************)

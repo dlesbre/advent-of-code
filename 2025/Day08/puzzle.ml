@@ -49,9 +49,6 @@ module Union_Find = struct
       raise LastConnection
 end
 
-(**)
-
-
 let preprocess input =
   let input = List.mapi (fun id s -> Scanf.sscanf s "%d,%d,%d" (fun x y z -> { id; pos =x,y,z })) input in
   let distances = pairwise_distances input in
@@ -72,19 +69,6 @@ let rec join_smallest clusters distances = function
         | () -> join_smallest clusters distances (n-1)
         | exception LastConnection -> Either.Right(x,y)
 
-type max3 = | Zero | One of int | Two of int * int | Three of int * int * int
-
-let max3 elt = function
-  | Zero -> One elt
-  | One a -> if elt > a then Two(elt,a) else Two (a, elt)
-  | Two (a,b) -> if elt > a then Three(elt,a,b)
-                 else if elt > b then Three(a,elt,b)
-                 else Three(a,b,elt)
-  | Three (a,b,c) as acc ->
-      if elt > a then Three(elt,a,b)
-      else if elt > b then Three(a,elt,b)
-      else if elt > c then Three(a,b,elt)
-      else acc
 
 let part1 (clusters, distances) =
   match join_smallest clusters distances (nb_connections ()) with
@@ -92,10 +76,10 @@ let part1 (clusters, distances) =
   | Left(clusters, distances) ->
   let max3 acc = function
     | Union_Find.Child _ -> acc
-    | Union_Find.Root n -> max3 n acc
+    | Union_Find.Root n -> max_n 3 Int.compare acc n
   in
-  match Array.fold_left max3 Zero clusters with
-  | Three(a,b,c) -> a*b*c, (clusters,distances)
+  match Array.fold_left max3 max_n_init clusters with
+  | { elts=[a;b;c]; _ } -> a*b*c, (clusters,distances)
   | _ -> failwith "Not enough clusters"
 
 let part2 _ (clusters, distances) =

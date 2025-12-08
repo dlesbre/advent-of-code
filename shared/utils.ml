@@ -17,7 +17,6 @@ let rec pow res a = function
   | n -> pow (res*(if n land 1 = 0 then 1 else a)) (a * a) (n / 2)
 let pow = pow 1
 
-
 let string_suffix str start = String.sub str start (String.length str - start)
 
 let rec read_all_lines acc =
@@ -106,6 +105,18 @@ let hashtbl_cons table key n =
   match Hashtbl.find table key with
   | x -> Hashtbl.replace table key (n :: x)
   | exception Not_found -> Hashtbl.add table key [n]
+
+type 'a max_n = { size: int; elts: 'a list }
+let max_n_init = { size=0; elts=[] }
+let rec insert compare elt = function
+  | [] -> [elt]
+  | (x::_ as list) when compare elt x <= 0 -> elt::list
+  | x::q -> x::(insert compare elt q)
+let max_n n compare { size; elts } elt =
+  let elts = insert compare elt elts in
+  if size = n
+  then { size; elts=List.tl elts }
+  else { size=size+1; elts }
 
 module IntSet = Set.Make(Int)
 module IntMap = Map.Make(Int)
