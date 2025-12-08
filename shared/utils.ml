@@ -63,6 +63,12 @@ let rec list_split f local_acc global_acc = function
   | x::xs -> list_split f (x::local_acc) global_acc xs
 let list_split f l = list_split f [] [] l
 
+let rec list_fold_pairs  ~reflexive f acc = function
+  | [] -> acc
+  | t::q -> let acc = if reflexive then f acc t t else acc in
+            let acc = List.fold_left (fun acc t' -> f acc t t') acc q in
+            list_fold_pairs ~reflexive f acc q
+
 let string_foldi f str acc =
   String.fold_left (fun (i, acc) c -> (i+1,f i c acc)) (0, acc) str |> snd
 
@@ -198,29 +204,39 @@ let test = ref false
 
 type solution = Wrapped: {
   preprocess: string list -> 'a;
-  part1: 'a -> string;
-  part2: 'a -> string;
+  part1: 'a -> string * 'b;
+  part2: 'a -> 'b -> string;
 } -> solution
 
 let solutions = ref []
 
-let register ~year ~day ~preprocess ~part1 ~part2 =
+let register_chained ~year ~day ~preprocess ~part1 ~part2 =
   if List.mem_assoc (year, day) !solutions then
     failwith ("Duplicate solution for " ^(string_of_int year)^" day "^(string_of_int day));
-  solutions := ((year, day), Wrapped{preprocess;part1;part2})::!solutions
+  solutions := ((year, day), Wrapped{ preprocess; part1; part2 })::!solutions
+
+let register_int_chained ~year ~day ~preprocess ~part1 ~part2 =
+  register_chained ~year ~day ~preprocess
+    ~part1:(fun x -> let res, c = part1 x in string_of_int res, c)
+    ~part2:(fun x y -> string_of_int (part2 x y))
+
+let register ~year ~day ~preprocess ~part1 ~part2 =
+  register_chained ~year ~day ~preprocess
+    ~part1:(fun x -> part1 x, ())
+    ~part2:(fun x ()  -> part2 x)
 
 let register_int ~year ~day ~preprocess ~part1 ~part2 =
   register ~year ~day ~preprocess
     ~part1:(fun x -> string_of_int (part1 x))
     ~part2:(fun x -> string_of_int (part2 x))
 
-
 let run_solution ~year ~day =
   match List.assoc (year, day) !solutions with
   | Wrapped{preprocess;part1;part2} ->
       Format.printf "Running puzzle %4d, day %2d@." year day;
       let input = preprocess (read_all_lines ()) in
-      Format.printf "Part 1 : %s@." (part1 input);
-      Format.printf "Part 2 : %s@." (part2 input)
+      let res, p1 = part1 input in
+      Format.printf "Part 1 : %s@." res;
+      Format.printf "Part 2 : %s@." (part2 input p1)
   | exception Not_found ->
       Format.eprintf "No puzzle solution for %4d, day %2d@." year day

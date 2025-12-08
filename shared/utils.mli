@@ -50,6 +50,11 @@ val list_split: ('a -> bool) -> 'a list -> 'a list list
     For example: [list_split (fun x -> x = 0) [1;2;3;0;0;5;7;0;1;3;0]]
     is [[ [1;2;3]; []; [5;7]; [1;3]; []]] *)
 
+val list_fold_pairs: reflexive:bool -> ('res -> 'elt -> 'elt -> 'res) -> 'res -> 'elt list -> 'res
+(** [list_fold_pairs ~reflexive f res list] applies [f] to all pairs of list elements.
+    If [reflexive] is true, this includes calls [f res x x] for each element [x],
+    otherwise it only includes [f res x y] where [y] appears AFTER [x] in the list. *)
+
 
 val ( |>> ) : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c
 
@@ -141,6 +146,8 @@ val polygon_double_area: (int * int) list -> int
 val test: bool ref
 (** True when running on test input, false otherwise *)
 
+(** {2 Independent P1 and P2} *)
+
 val register:
   year:int ->
   day:int ->
@@ -155,6 +162,25 @@ val register_int:
   preprocess:(string list -> 'a) ->
   part1:('a -> int) ->
   part2:('a -> int) ->
+  unit
+
+(** {2 Chained P1 and P2} *)
+(** In these, part 2 can reuse a result from part 1. *)
+
+val register_chained:
+  year:int ->
+  day:int ->
+  preprocess:(string list -> 'a) ->
+  part1:('a -> string * 'b) ->
+  part2:('a -> 'b -> string) ->
+  unit
+
+val register_int_chained:
+  year:int ->
+  day:int ->
+  preprocess:(string list -> 'a) ->
+  part1:('a -> int * 'b) ->
+  part2:('a -> 'b -> int) ->
   unit
 
 val run_solution: year:int -> day:int -> unit
