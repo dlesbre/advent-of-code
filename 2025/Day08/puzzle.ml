@@ -8,13 +8,12 @@ let euclidian_dist_squared (x1,y1,z1) (x2,y2,z2) =
   let dz = z1 - z2 in
   dx*dx + dy*dy + dz*dz
 
-let pairwise_distances =
+let pairwise_distances input =
   list_fold_pairs ~reflexive:false (fun map x y ->
     let dist = euclidian_dist_squared x.pos y.pos in
-    if IntMap.mem dist map
-    then failwith "duplicate distance"
-    else IntMap.add dist (x,y) map
-  ) IntMap.empty
+    (dist, (x,y)):: map
+  ) [] input
+  |> List.sort (fun (d1,_) (d2,_) -> Int.compare d1 d2)
 
 exception LastConnection
 
@@ -66,8 +65,8 @@ let pp fmt {id;pos=(x,y,z)} =
 let rec join_smallest clusters distances = function
   | 0 -> Either.Left (clusters, distances)
   | n ->
-      let min_dist, (x,y) = IntMap.min_binding distances in
-      let distances = IntMap.remove min_dist distances in
+      let _, (x,y) = List.hd distances in
+      let distances = List.tl distances in
       if Union_Find.find clusters x.id = Union_Find.find clusters y.id
       then join_smallest clusters distances (n-1) (* already bound, go to next smallest *)
       else match Union_Find.union clusters x.id y.id with
@@ -101,7 +100,7 @@ let part1 (clusters, distances) =
   | _ -> failwith "Not enough clusters"
 
 let part2 _ (clusters, distances) =
-  match join_smallest clusters distances ((IntMap.cardinal distances) + 3) with
+  match join_smallest clusters distances ((List.length distances) + 3) with
   | Left _ -> failwith "Did not merge all clusters"
   | Right({ pos=(x,_,_); _ }, { pos=(x',_,_); _ }) -> x * x'
 
