@@ -147,7 +147,7 @@ type 'a max_n = {
 val max_n_init: 'a max_n
 
 val max_n: int -> ('a -> 'a -> int) -> 'a max_n -> 'a -> 'a max_n
-(** [max_n n compare elt prev_max] updates [prev_max] to find the also consider [n].
+(** [max_n n compare prev_max elt] updates [prev_max] to find the also consider [n].
     This is meant to be used in a fold to find the n maximal elements of a list/array/... :
     [List.fold_left (max_n n compare) max_n_init my_list]
 
