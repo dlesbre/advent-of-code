@@ -36,6 +36,7 @@ module Union_Find = struct
   let union uf a b =
     let a, size_a = find uf a in
     let b, size_b = find uf b in
+    if a = b then () else
     if size_a > size_b then (
       uf.(b) <- Child a;
       uf.(a) <- Root (size_a + size_b);
@@ -67,10 +68,8 @@ let rec join_smallest clusters distances = function
   | n ->
       let _, (x,y) = List.hd distances in
       let distances = List.tl distances in
-      if Union_Find.find clusters x.id = Union_Find.find clusters y.id
-      then join_smallest clusters distances (n-1) (* already bound, go to next smallest *)
-      else match Union_Find.union clusters x.id y.id with
-        | () -> join_smallest clusters  distances (n-1)
+      match Union_Find.union clusters x.id y.id with
+        | () -> join_smallest clusters distances (n-1)
         | exception LastConnection -> Either.Right(x,y)
 
 type max3 = | Zero | One of int | Two of int * int | Three of int * int * int
