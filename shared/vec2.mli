@@ -10,6 +10,17 @@ val of_string: string -> t
 val in_box: t -> low:t -> high:t -> bool
 (** [in_box t ~low ~high] is true iff [low.x <= t.x <= high.x] and same for y *)
 
+val bounding_box: t list -> t * t
+(** Returns the smallest bounding box containing all items in the (non-empty) argument list,
+    i.e. [low, high] such that [List.forall (in_box ~low ~high) list].
+    the first point's coordinates are both smaller than the second's*)
+
+val intersect_x_line: x:int -> y1:int -> y2:int -> low:t -> high:t -> bool
+(** Test if the line [(x,y1) -- (x,y2)] inclusive intersects the bounding box *)
+
+val intersect_y_line: y:int -> x1:int -> x2:int -> low:t -> high:t -> bool
+(** Test if the line [(x1,y) -- (x2,y)] inclusive intersects the bounding box *)
+
 val ( +| ) : t -> t -> t
 val ( -| ) : t -> t -> t
 val ( ~| ) : t -> t (** unary minus *)

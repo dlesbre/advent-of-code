@@ -23,3 +23,5 @@ val sum: (int -> int) -> t -> int
 
 val count: (int -> bool) -> t -> int
 (** [count f r] counts the number of elements of r that satisfy [f] *)
+
+val pp: Format.formatter -> t -> unit

@@ -55,6 +55,8 @@ val list_fold_pairs: reflexive:bool -> ('res -> 'elt -> 'elt -> 'res) -> 'res ->
     If [reflexive] is true, this includes calls [f res x x] for each element [x],
     otherwise it only includes [f res x y] where [y] appears AFTER [x] in the list. *)
 
+val list_pp: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a list -> unit
+
 val ( |>> ) : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c
 
 val set_fold_pairs:
@@ -131,6 +133,13 @@ val binary_search: (int -> int) -> int -> int -> binary_search_result
       In that case, [n] is the lowest element of [low..high] such that [f n > 0].
       This assumes [f high >= 0].
       If not, may return [Absent high] with [f high < 0]. *)
+
+val array_binary_search: ('a -> int) -> 'a array -> binary_search_result
+(** [array_binary_search f array] returns [Present i] such that [f array.(i) = 0]
+    if it exists, else [Absent i] with either [i = Array.length array - 1] or
+    [f array.(i) > 0] and [f array.(i-1)] undefined or [< 0]
+
+    Assumes the sign of [f] is increasing on the array. *)
 
 val polygon_double_area: (int * int) list -> int
 (** [polygon_double_area polygon] returns the double of the area of the polygon delimited by

@@ -31,3 +31,7 @@ let fold f range acc = fold f range range.start acc
 
 let sum f range = fold (fun i acc -> f i + acc) range 0
 let count f range = fold (fun i acc -> if f i then acc+1 else acc) range 0
+
+let pp fmt = function
+  | { start; stop; step=1; } -> Format.fprintf fmt "[%d:%d[" start stop
+  | { start; stop; step } -> Format.fprintf fmt "[%d:%d:%d[" start stop step

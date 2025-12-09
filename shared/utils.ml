@@ -68,6 +68,8 @@ let rec list_fold_pairs  ~reflexive f acc = function
             let acc = List.fold_left (fun acc t' -> f acc t t') acc q in
             list_fold_pairs ~reflexive f acc q
 
+let list_pp f fmt = Format.pp_print_list ~pp_sep:(fun fmt () -> Format.fprintf fmt "; ") f fmt
+
 let string_foldi f str acc =
   String.fold_left (fun (i, acc) c -> (i+1,f i c acc)) (0, acc) str |> snd
 
@@ -176,6 +178,8 @@ let rec binary_search f low high =
   else if n < 0
   then binary_search f (mid+1) high
   else binary_search f low (mid-1)
+
+let array_binary_search f array = binary_search (fun i -> f array.(i)) 0 (Array.length array - 1)
 
 let rec gcd a = function
   | 0 -> a
