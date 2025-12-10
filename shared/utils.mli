@@ -55,6 +55,8 @@ val list_fold_pairs: reflexive:bool -> ('res -> 'elt -> 'elt -> 'res) -> 'res ->
     If [reflexive] is true, this includes calls [f res x x] for each element [x],
     otherwise it only includes [f res x y] where [y] appears AFTER [x] in the list. *)
 
+val list_foldi: (int -> 'acc -> 'a -> 'acc) -> 'acc -> 'a list -> 'acc
+
 val list_pp: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a list -> unit
 
 val ( |>> ) : ('a -> 'b) -> ('b -> 'c) -> 'a -> 'c

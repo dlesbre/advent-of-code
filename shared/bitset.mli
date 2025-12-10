@@ -6,13 +6,20 @@
 module type S = sig
   type elt
   type t
+
   val empty: t
   val singleton: elt -> t
+  val of_list: elt list -> t
+
   val mem: elt -> t -> bool
   val add: elt -> t -> t
   val remove: elt -> t -> t
+
   val union: t -> t -> t
   val inter: t -> t -> t
+  val disjoint_union: t -> t -> t
+  (** [disjoint_union l r] is the set of elements that are in either [l] or [r],
+      but not both *)
 end
 
 module Make(Elt:sig

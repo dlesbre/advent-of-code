@@ -3,11 +3,13 @@ module type S = sig
   type t
   val empty: t
   val singleton: elt -> t
+  val of_list: elt list -> t
   val mem: elt -> t -> bool
   val add: elt -> t -> t
   val remove: elt -> t -> t
   val union: t -> t -> t
   val inter: t -> t -> t
+  val disjoint_union: t -> t -> t
 end
 
 module Make(Elt:sig
@@ -22,7 +24,9 @@ end) : S with type elt = Elt.t = struct
   let mem x s = singleton x land s <> 0
   let remove x s = s land (lnot (singleton x))
   let union a b = a lor b
+  let of_list = List.fold_left (fun set l -> union set (singleton l)) empty
   let inter a b = a land b
+  let disjoint_union a b = a lxor b
 end
 
 module MakeGeneric(Elt: sig type t end) = Make(struct

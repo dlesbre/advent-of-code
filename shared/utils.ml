@@ -62,6 +62,8 @@ let rec list_split f local_acc global_acc = function
   | x::xs -> list_split f (x::local_acc) global_acc xs
 let list_split f l = list_split f [] [] l
 
+let list_foldi f acc l = List.fold_left (fun (i, acc) elt -> (i+1, f i acc elt)) (0, acc) l |> snd
+
 let rec list_fold_pairs  ~reflexive f acc = function
   | [] -> acc
   | t::q -> let acc = if reflexive then f acc t t else acc in

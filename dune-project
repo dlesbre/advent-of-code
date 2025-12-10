@@ -15,7 +15,12 @@
  (name advent_of_code)
  (synopsis "Puzzle solutions for advent of code in OCaml")
  (description "A longer description")
- (depends ocaml)
+ (depends
+  ocaml
+  dune
+  zarith
+  z3 ; 2025 - day 10
+  )
  (tags ("advent of code")))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html

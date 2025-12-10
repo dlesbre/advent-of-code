@@ -1,6 +1,12 @@
 (library
  (name AOC2025)
- (libraries AOC str unix)
+ (libraries
+  AOC
+  str
+  unix
+  zarith ; day 10
+  z3 ; day 10
+  )
  (library_flags :standard -linkall)
  (flags :standard -warn-error -A -open AOC -open AOC.Utils))
 
