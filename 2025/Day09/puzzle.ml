@@ -59,16 +59,16 @@ let rec flood_fill grid = function
 exception Invalid
 
 let valid grid lines cols (xa,ya) (xb,yb) =
-  try
-    let y_0 = find_pos lines (min ya yb) in
-    let y_max = find_pos lines (max ya yb) in
-    for x = find_pos cols (min xa xb) to find_pos cols (max xa xb) do
-      for y = y_0 to y_max do
-        if Grid.get grid (x,y) = Outside then raise Invalid
-      done
-    done;
-    true
-  with Invalid -> false
+    let xa = find_pos cols xa in
+    let xb = find_pos cols xb in
+    let ya = find_pos lines ya in
+    let yb = find_pos lines yb in
+    Range.forall (fun y -> Grid.get grid (xa,y) <> Outside &&
+                           Grid.get grid (xb,y) <> Outside)
+      (Range.inclusive_interval (min ya yb) (max ya yb))
+    && Range.forall (fun x -> Grid.get grid (x,ya) <> Outside &&
+                            Grid.get grid (x,yb) <> Outside)
+      (Range.inclusive_interval (min xa xb) (max xa xb))
 
 let part2 input =
   let lines, cols = lines_and_columns_indexes input in

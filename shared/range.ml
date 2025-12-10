@@ -6,6 +6,7 @@ type t = {
 
 let upto stop = { start=0; stop; step=1 }
 let interval start stop = { start; stop; step=1 }
+let inclusive_interval start stop = interval start (stop+1)
 
 let end_iteration r n = if r.step > 0 then n >= r.stop else n <= r.stop
 

@@ -14,6 +14,9 @@ val upto: int -> t
 val interval: int -> int -> t
 (** [interval los high] is range [lo, lo+1, .., high-1] *)
 
+val inclusive_interval: int -> int -> t
+(** [inclusive_interval los high] is range [lo, lo+1, .., high] *)
+
 val iter: (int -> unit) -> t -> unit
 val fold: (int -> 'acc -> 'acc) -> t -> 'acc -> 'acc
 val forall: (int -> bool) -> t -> bool
