@@ -122,6 +122,7 @@ let max_n n compare { size; elts } elt =
   then { size; elts=List.tl elts }
   else { size=size+1; elts }
 
+module StringMap = Map.Make(String)
 module IntSet = Set.Make(Int)
 module IntMap = Map.Make(Int)
 

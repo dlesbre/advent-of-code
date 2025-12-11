@@ -82,6 +82,7 @@ val hashtbl_incr: ('a, int) Hashtbl.t -> 'a -> int -> unit
 val hashtbl_cons: ('a, 'b list) Hashtbl.t -> 'a -> 'b -> unit
 (** [hashtbl_cons table key n] does [table[key] = n :: table[key]], creating [table[key]] if absent. *)
 
+module StringMap : Map.S with type key = string
 
 (** {1 Integer map as priority queue}                                         *)
 (******************************************************************************)
